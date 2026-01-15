@@ -1,0 +1,172 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm border-bottom border-secondary">
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold text-uppercase d-flex align-items-center">
+      <div class="bg-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+        <i class="bi bi-grid-3x3-gap-fill text-white" style="font-size: 1.2rem;"></i>
+      </div>
+      <span>ERP <span class="text-primary">System</span></span>
+    </span>
+    
+    <div class="d-flex align-items-center text-white">
+      <div class="text-end me-3 d-none d-md-block lh-1">
+        <div class="fw-bold">{{ usuario }}</div>
+        <small class="text-white-50" style="font-size: 0.75rem;">{{ rolEtiqueta }}</small>
+      </div>
+      <button class="btn btn-outline-danger btn-sm rounded-pill px-3" (click)="logout()">
+        <i class="bi bi-power me-1"></i> Salir
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 pb-5">
+  
+  <!-- MONITOR (Solo Admin y Contador para auditoría) -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm bg-primary text-white overflow-hidden position-relative" 
+           (click)="navegar('/dashboard', ['ADMIN', 'CONTADOR'])" 
+           style="cursor: pointer; background: linear-gradient(45deg, #0d6efd, #0a58ca);">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between position-relative" style="z-index: 1;">
+          <div>
+            <h4 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2"></i>Monitor del Sistema</h4>
+            <p class="mb-0 opacity-75">Visualiza métricas y estado en tiempo real.</p>
+          </div>
+          <span class="badge bg-white text-primary rounded-pill px-3 py-2 fs-6">LIVE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- 1. FACTURACIÓN (Operativo: Admin y Vendedor) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm hover-card">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Facturación</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <!-- Nueva Factura: SOLO VENDEDOR Y ADMIN -->
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/facturacion', ['ADMIN', 'VENDEDOR'])">
+              <span class="fw-bold text-primary">Nueva Factura</span>
+              <i class="bi bi-plus-circle fs-5"></i>
+            </button>
+
+            <!-- Historial: TODOS (El vendedor ve sus ventas, Contador audita) -->
+            <button class="list-group-item list-group-item-action py-2 text-muted" 
+                    (click)="navegar('/historial', ['ADMIN', 'VENDEDOR', 'CONTADOR'])">
+              <i class="bi bi-clock-history me-2"></i>Historial Emitido
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CLIENTES (Operativo: Admin y Vendedor) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm hover-card">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Clientes</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/clientes', ['ADMIN', 'VENDEDOR'])">
+              <span class="fw-bold text-success">Directorio de Clientes</span>
+              <i class="bi bi-person-lines-fill fs-5"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. INVENTARIO (Operativo: Admin y Vendedor) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm hover-card">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Inventario</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/productos', ['ADMIN', 'VENDEDOR'])">
+              <span class="fw-bold text-dark">Gestión de Productos</span>
+              <i class="bi bi-list-check fs-5"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PROVEEDORES (Administrativo: Admin y Contador) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm hover-card">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Proveedores</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <!-- VENDEDOR NO ENTRA AQUÍ -->
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/proveedores', ['ADMIN', 'CONTADOR'])">
+              <span class="fw-bold text-indigo">Lista de Proveedores</span>
+              <i class="bi bi-building fs-5"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. CONFIGURACIÓN (Solo Admin) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm hover-card">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Configuración</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/configuracion', ['ADMIN'])">
+              <span class="fw-bold text-secondary">Datos de Empresa</span>
+              <i class="bi bi-gear fs-5"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. SEGURIDAD (Solo Admin - Oculto para otros) -->
+    <div class="col-md-6 col-xl-4" *ngIf="esAdmin">
+      <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
+        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Seguridad</h5></div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            
+            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
+                    (click)="navegar('/usuarios', ['ADMIN'])">
+              <span class="fw-bold text-danger">Usuarios y Roles</span>
+              <i class="bi bi-person-gear fs-5"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SOPORTE (Todos) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="card h-100 border-0 shadow-sm bg-light">
+        <div class="card-body text-center d-flex flex-column justify-content-center">
+          <h6 class="fw-bold mb-3">¿Necesitas Ayuda?</h6>
+          <button class="btn btn-dark rounded-pill" (click)="navegar('/contactanos', ['ADMIN', 'VENDEDOR', 'CONTADOR'])">
+            Contactar Soporte
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

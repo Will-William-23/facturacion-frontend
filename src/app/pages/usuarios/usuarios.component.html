@@ -1,0 +1,82 @@
+<div class="container mt-4">
+  <h2 class="text-dark mb-4">Gestión de Personal</h2>
+
+  <div class="row">
+    <!-- Formulario -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm border-dark">
+        <div class="card-header bg-dark text-white">
+          {{ editando ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="guardarUsuario()">
+            <div class="mb-3">
+              <label>Usuario (Login)</label>
+              <input type="text" class="form-control" [(ngModel)]="usuarioForm.username" name="username" required>
+            </div>
+            <div class="mb-3">
+              <label>Contraseña</label>
+              <input type="password" class="form-control" [(ngModel)]="usuarioForm.password" name="password" 
+                     [placeholder]="editando ? 'Dejar vacío para mantener actual' : 'Ingrese clave'">
+            </div>
+            <div class="mb-3">
+              <label>Rol / Permisos</label>
+              <select class="form-select" [(ngModel)]="usuarioForm.role" name="role">
+                <option value="ADMIN">Administrador</option>
+                <option value="VENDEDOR">Vendedor</option>
+                <option value="CONTADOR">Contador</option>
+              </select>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-primary'">
+                {{ editando ? 'Actualizar' : 'Crear Usuario' }}
+              </button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuarios">
+                <td>{{ u.id }}</td>
+                <td class="fw-bold">{{ u.username }}</td>
+                <td>
+                  <span class="badge" 
+                    [ngClass]="{
+                      'bg-danger': u.role === 'ADMIN',
+                      'bg-success': u.role === 'VENDEDOR',
+                      'bg-warning text-dark': u.role === 'CONTADOR'
+                    }">
+                    {{ u.role }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-2" (click)="editarUsuario(u)">Editar</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarUsuario(u.id)">Borrar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+ 
+</div>

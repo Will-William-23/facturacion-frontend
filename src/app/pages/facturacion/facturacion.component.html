@@ -1,0 +1,103 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary">Nueva Venta</h2>
+    
+  </div>
+
+  <div class="row">
+    <!-- PANEL IZQUIERDO: SELECCIÓN -->
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-dark text-white">1. Datos de Venta</div>
+        <div class="card-body">
+          
+          <!-- Selector Cliente -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Cliente</label>
+            <select class="form-select" [(ngModel)]="clienteSeleccionado">
+              <option [ngValue]="null" disabled selected>Seleccione...</option>
+              <option *ngFor="let c of clientes" [value]="c.id">
+                {{ c.nombre }} {{ c.apellido }}
+              </option>
+            </select>
+          </div>
+
+          <hr>
+
+          <!-- Selector Producto -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Producto</label>
+            <select class="form-select" [(ngModel)]="productoSeleccionado">
+              <option [ngValue]="null" disabled selected>Seleccione...</option>
+              <option *ngFor="let p of productos" [value]="p.id">
+                {{ p.nombre }} - ${{ p.precio }} (Stock: {{p.stock}})
+              </option>
+            </select>
+          </div>
+
+          <!-- Cantidad -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Cantidad</label>
+            <input type="number" class="form-control" [(ngModel)]="cantidad" min="1">
+          </div>
+
+          <button class="btn btn-primary w-100" (click)="agregarProducto()">
+            ⬇ Agregar al Carrito
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DERECHO: CARRITO -->
+    <div class="col-md-8">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light fw-bold">2. Detalle de Factura</div>
+        <div class="card-body">
+          
+          <table class="table table-bordered text-center align-middle">
+            <thead class="table-secondary">
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cant.</th>
+                <th>Subtotal</th>
+                <th>Quitar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of carrito; let i = index">
+                <td class="text-start">{{ item.producto.nombre }}</td>
+                <td>${{ item.producto.precio }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal }}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm py-0" (click)="eliminarDelCarrito(i)">×</button>
+                </td>
+              </tr>
+              <tr *ngIf="carrito.length === 0">
+                <td colspan="5" class="text-muted py-4">
+                  <i class="bi bi-cart-x display-6 d-block mb-2"></i>
+                  El carrito está vacío
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+        <div class="card-footer bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="fw-bold text-dark m-0">Total: ${{ total | number:'1.2-2' }}</h3>
+            <button class="btn btn-success btn-lg px-5" 
+                    (click)="procesarFactura()"
+                    [disabled]="carrito.length === 0 || !clienteSeleccionado">
+              💾 Facturar
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+</div>

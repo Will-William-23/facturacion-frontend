@@ -1,0 +1,48 @@
+<div class="container mt-4">
+  <h2 class="text-primary mb-4">Historial de Ventas</h2>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Estado SRI</th>
+            <th>Acciones</th> <!-- COLUMNA NUEVA -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of facturas">
+            <td>{{ f.id }}</td>
+            <td>{{ f.fecha | date:'short' }}</td>
+            <td>{{ f.cliente.nombre }} {{ f.cliente.apellido }}</td>
+            <td class="fw-bold">${{ f.total | number:'1.2-2' }}</td>
+            <td>
+              <span class="badge" 
+                [ngClass]="f.estadoSri === 'AUTORIZADO' ? 'bg-success' : 'bg-danger'">
+                {{ f.estadoSri || 'PENDIENTE' }}
+              </span>
+            </td>
+             <!-- BOTÓN NUEVO -->
+      <td>
+        <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
+          <i class="bi bi-file-pdf"></i> PDF
+        </button>
+      </td>
+    
+ 
+          </tr>
+          <tr *ngIf="facturas.length === 0">
+            <td colspan="6" class="text-center">No hay facturas registradas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  
+</div>

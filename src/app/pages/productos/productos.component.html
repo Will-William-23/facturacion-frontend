@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <h2 class="text-success mb-4">Inventario de Productos</h2>
+
+  <div class="row">
+    <!-- Formulario -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm border-success">
+        <div class="card-header bg-success text-white">
+          {{ editando ? 'Editar Producto' : 'Nuevo Producto' }}
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="guardarProducto()">
+            <div class="mb-2">
+              <label>Nombre</label>
+              <input type="text" class="form-control" [(ngModel)]="productoForm.nombre" name="nombre" required>
+            </div>
+            <div class="mb-2">
+              <label>Descripción</label>
+              <input type="text" class="form-control" [(ngModel)]="productoForm.descripcion" name="descripcion">
+            </div>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <label>Precio ($)</label>
+                <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio" required>
+              </div>
+              <div class="col-6 mb-3">
+                <label>Stock</label>
+                <input type="number" class="form-control" [(ngModel)]="productoForm.stock" name="stock" required>
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">
+                {{ editando ? 'Actualizar' : 'Guardar' }}
+              </button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla con Buscador -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <input type="text" class="form-control" placeholder="🔍 Buscar producto..." [(ngModel)]="searchText">
+        </div>
+        <div class="card-body">
+          <table class="table table-striped align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Filtro aplicado aquí -->
+              <tr *ngFor="let p of productos | filter:searchText:'nombre'">
+                <td>{{ p.nombre }}</td>
+                <td>${{ p.precio }}</td>
+                <td>
+                  <span class="badge" [ngClass]="p.stock < 5 ? 'bg-danger' : 'bg-success'">
+                    {{ p.stock }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-warning btn-sm me-2" (click)="editarProducto(p)">✏️</button>
+                  <button class="btn btn-danger btn-sm" (click)="eliminarProducto(p.id)">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+</div>
+
