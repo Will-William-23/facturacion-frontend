@@ -1,7 +1,69 @@
 <div class="container mt-4">
-  <h2 class="text-success mb-4">Inventario de Productos</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-success mb-0">Inventario de Productos</h2>
+    <button class="btn btn-outline-primary" (click)="toggleModoProveedores()">
+      {{ modoProveedores ? 'Volver a Inventario' : 'Proveedores' }}
+    </button>
+  </div>
 
-  <div class="row">
+  <!-- VISTA MODO PROVEEDORES -->
+  <div *ngIf="modoProveedores" class="row">
+    <div class="col-md-4">
+      <div class="list-group">
+        <button *ngFor="let prov of proveedores" class="list-group-item list-group-item-action"
+          [class.active]="proveedorSeleccionado?.id === prov.id" (click)="seleccionarProveedor(prov)">
+          {{ prov.nombreEmpresa }}
+          <br><small>{{ prov.ruc }}</small>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div *ngIf="proveedorSeleccionado; else noProv" class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          Productos de: {{ proveedorSeleccionado.nombreEmpresa }}
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Stock Actual</th>
+                <th>Coste Unitario</th>
+                <th>Comprar (Cantidad)</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let prod of productosProveedor">
+                <td>{{ prod.nombre }}</td>
+                <td>{{ prod.stock }}</td>
+                <td>${{ prod.precio }}</td>
+                <td>
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="prod.cantidadCompra" min="0"
+                    style="width: 80px;">
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-success" (click)="realizarCompra(prod)">
+                    Comprar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="productosProveedor.length === 0" class="alert alert-info mt-3">
+            Este proveedor no tiene productos asignados.
+          </div>
+        </div>
+      </div>
+      <ng-template #noProv>
+        <div class="alert alert-light text-center border">
+          Seleccione un proveedor para ver sus productos disponibles.
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!modoProveedores">
     <!-- Formulario -->
     <div class="col-md-4 mb-4">
       <div class="card shadow-sm border-success">

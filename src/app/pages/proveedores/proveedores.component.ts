@@ -15,13 +15,13 @@ import Swal from 'sweetalert2';
   styleUrls: ['./proveedores.component.css']
 })
 export class ProveedoresComponent implements OnInit {
-  
+
   proveedores: Proveedor[] = [];
-  form: Proveedor = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '' };
+  form: Proveedor = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
   editando: boolean = false;
   searchText: string = '';
 
-  constructor(private api: ApiService, private cd: ChangeDetectorRef) {}
+  constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void { this.cargar(); }
 
@@ -52,7 +52,7 @@ export class ProveedoresComponent implements OnInit {
     obs.subscribe({
       next: () => {
         Swal.fire('Éxito', 'Proveedor guardado', 'success');
-        this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '' };
+        this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
         this.editando = false;
         this.cargar();
       },
@@ -61,11 +61,11 @@ export class ProveedoresComponent implements OnInit {
   }
 
   eliminar(id: number | undefined) {
-    if(!id) return;
+    if (!id) return;
     Swal.fire({
       title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí'
     }).then((r) => {
-      if(r.isConfirmed) {
+      if (r.isConfirmed) {
         this.api.deleteProveedor(id).subscribe({
           next: () => { this.cargar(); Swal.fire('Eliminado', '', 'success'); }
         });
@@ -75,6 +75,39 @@ export class ProveedoresComponent implements OnInit {
 
   cancelar() {
     this.editando = false;
-    this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '' };
+    this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
+  }
+
+  agregarProducto() {
+    if (!this.form.productos) {
+      this.form.productos = [];
+    }
+    this.form.productos.push({
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      stock: 0,
+      tipo: '',
+      imagen: ''
+    });
+  }
+
+  quitarProducto(index: number) {
+    if (this.form.productos) {
+      this.form.productos.splice(index, 1);
+    }
+  }
+
+  onFileSelected(event: any, index: number) {
+    const file = event.target.files[0];
+    if (file && this.form.productos) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (this.form.productos && this.form.productos[index]) {
+          this.form.productos[index].imagen = e.target?.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

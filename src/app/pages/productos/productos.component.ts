@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Producto } from '../../interfaces/producto';
+import { Proveedor } from '../../interfaces/proveedor';
 import Swal from 'sweetalert2';
 import { FilterPipe } from '../../pipes/filter.pipe'; // <-- Importar Pipe
 @Component({
@@ -19,6 +20,13 @@ export class ProductosComponent implements OnInit {
   productoForm: Producto = { nombre: '', descripcion: '', precio: 0, stock: 0 };
   editando: boolean = false;
   searchText: string = ''; // <-- Variable para el buscador
+
+  // LOGICA COMPRA PROVEEDORES
+  modoProveedores: boolean = false;
+  proveedores: Proveedor[] = [];
+  proveedorSeleccionado: Proveedor | null = null;
+  productosProveedor: any[] = []; // Productos del proveedor seleccionado para compra
+
   private contieneLetrasRegex = /[a-zA-Z]/;
 
   // Inyectamos 'cd'
@@ -26,6 +34,7 @@ export class ProductosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarProductos();
+    this.cargarProveedores();
   }
 
   cargarProductos() {
@@ -34,6 +43,13 @@ export class ProductosComponent implements OnInit {
         this.productos = data;
         this.cd.detectChanges(); // <-- ESTO FUERZA LA ACTUALIZACIÓN VISUAL
       },
+      error: (e) => console.error(e)
+    });
+  }
+
+  cargarProveedores() {
+    this.api.getProveedores().subscribe({
+      next: (data) => { this.proveedores = data; },
       error: (e) => console.error(e)
     });
   }
@@ -116,4 +132,61 @@ export class ProductosComponent implements OnInit {
     this.cancelarEdicion();
     this.cargarProductos();
   }
+
+  // --- MÉTODOS MODO PROVEEDORES ---
+
+  toggleModoProveedores() {
+    this.modoProveedores = !this.modoProveedores;
+    this.proveedorSeleccionado = null;
+    this.productosProveedor = [];
+  }
+
+  seleccionarProveedor(prov: Proveedor) {
+    this.proveedorSeleccionado = prov;
+    // Mapeamos los productos y añadimos un campo 'cantidadCompra'
+    this.productosProveedor = (prov.productos || []).map(p => ({ ...p, cantidadCompra: 0 }));
+  }
+
+  realizarCompra(producto: any) {
+    if (!producto.cantidadCompra || producto.cantidadCompra <= 0) {
+      Swal.fire('Error', 'Ingrese una cantidad válida', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: '¿Confirmar compra?',
+      text: `Se añadirán ${producto.cantidadCompra} unidades al stock de ${producto.nombre}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, comprar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Actualizamos el stock
+        const nuevoStock = (producto.stock || 0) + producto.cantidadCompra;
+
+        // Llamada a la API para actualizar el producto
+        // IMPORTANTE: Asegúrate de enviar el objeto completo o solo lo necesario según tu backend.
+        // Aquí enviamos todo el producto con el stock actualizado.
+        const productoActualizado = { ...producto, stock: nuevoStock };
+        // Eliminamos campos auxiliares antes de enviar si es necesario, 
+        // pero normalmente el backend ignora campos extra o usamos una interfaz limpia.
+        // TypeScript se quejará si no machea la interfaz, pero 'producto' es 'any' aqui temporalmente.
+        delete productoActualizado.cantidadCompra;
+
+        this.api.put(`productos/${producto.id}`, productoActualizado).subscribe({
+          next: () => {
+            Swal.fire('Compra realizada', 'Stock actualizado', 'success');
+            producto.stock = nuevoStock; // Actualizamos vista local
+            producto.cantidadCompra = 0; // Reseteamos input
+            this.cargarProductos(); // Actualizamos la lista general también
+            this.cargarProveedores(); // Actualizamos proveedores por si acaso (aunque los datos anidados tal vez no se refresquen solos sin recarga)
+          },
+          error: () => Swal.fire('Error', 'No se pudo procesar la compra', 'error')
+        });
+      }
+    });
+
+  }
+
+
 }

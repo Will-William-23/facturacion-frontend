@@ -1,3 +1,5 @@
+import { Producto } from "./producto";
+
 export interface Proveedor {
     id?: number;
     ruc: string;
@@ -6,4 +8,5 @@ export interface Proveedor {
     telefono: string;
     email: string;
     direccion: string;
+    productos?: Producto[];
 }
