@@ -12,7 +12,8 @@
           <form (ngSubmit)="guardarCliente()">
             <div class="mb-2">
               <label>Cédula</label>
-              <input type="text" class="form-control" [(ngModel)]="clienteForm.cedula" name="cedula" maxlength="10" required>
+              <input type="text" class="form-control" [(ngModel)]="clienteForm.cedula" name="cedula" maxlength="10"
+                required>
             </div>
             <div class="mb-2">
               <label>Nombre</label>
@@ -30,12 +31,13 @@
               <label>Dirección</label>
               <input type="text" class="form-control" [(ngModel)]="clienteForm.direccion" name="direccion" required>
             </div>
-            
+
             <div class="d-grid gap-2">
               <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">
                 {{ editando ? 'Actualizar' : 'Guardar' }}
               </button>
-              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary"
+                (click)="cancelarEdicion()">Cancelar</button>
             </div>
           </form>
         </div>
@@ -46,7 +48,8 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar por nombre..." [(ngModel)]="searchText">
+          <input type="text" class="form-control" placeholder="🔍 Buscar por nombre o por cédula..."
+            [(ngModel)]="searchText">
         </div>
         <div class="card-body">
           <table class="table table-hover align-middle">
@@ -59,7 +62,7 @@
             </thead>
             <tbody>
               <!-- Aplicamos el Pipe: filter:searchText -->
-              <tr *ngFor="let c of clientes | filter:searchText:'nombre'">
+              <tr *ngFor="let c of clientes | filter:searchText:['nombre', 'cedula']">
                 <td>{{ c.cedula }}</td>
                 <td>{{ c.nombre }} {{ c.apellido }}</td>
                 <td>
@@ -73,6 +76,6 @@
       </div>
     </div>
   </div>
-  
-  
+
+
 </div>

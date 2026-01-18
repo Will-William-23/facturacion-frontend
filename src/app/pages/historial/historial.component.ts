@@ -1,22 +1,26 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { FacturaResumen } from '../../interfaces/lista-facturas';
+import { FilterPipe } from '../../pipes/filter.pipe';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-historial',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule, FilterPipe],
   templateUrl: './historial.component.html',
   styleUrls: ['./historial.component.css']
 })
 export class HistorialComponent implements OnInit {
-  
-  facturas: FacturaResumen[] = [];
 
-  constructor(private api: ApiService, private cd: ChangeDetectorRef) {}
+  facturas: FacturaResumen[] = [];
+  searchClient: string = '';
+  searchDate: string = '';
+
+  constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.cargarDatos();

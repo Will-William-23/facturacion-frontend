@@ -3,6 +3,14 @@
 
   <div class="card shadow-sm">
     <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <input type="text" class="form-control" placeholder="🔍 Buscar por cliente..." [(ngModel)]="searchClient">
+        </div>
+        <div class="col-md-6">
+          <input type="date" class="form-control" [(ngModel)]="searchDate">
+        </div>
+      </div>
       <table class="table table-striped">
         <thead class="table-dark">
           <tr>
@@ -15,25 +23,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let f of facturas">
+          <tr
+            *ngFor="let f of facturas | filter:searchClient:['cliente.nombre', 'cliente.apellido'] | filter:searchDate:['fecha']">
             <td>{{ f.id }}</td>
             <td>{{ f.fecha | date:'short' }}</td>
             <td>{{ f.cliente.nombre }} {{ f.cliente.apellido }}</td>
             <td class="fw-bold">${{ f.total | number:'1.2-2' }}</td>
             <td>
-              <span class="badge" 
-                [ngClass]="f.estadoSri === 'AUTORIZADO' ? 'bg-success' : 'bg-danger'">
+              <span class="badge" [ngClass]="f.estadoSri === 'AUTORIZADO' ? 'bg-success' : 'bg-danger'">
                 {{ f.estadoSri || 'PENDIENTE' }}
               </span>
             </td>
-             <!-- BOTÓN NUEVO -->
-      <td>
-        <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
-          <i class="bi bi-file-pdf"></i> PDF
-        </button>
-      </td>
-    
- 
+            <!-- BOTÓN NUEVO -->
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
+                <i class="bi bi-file-pdf"></i> PDF
+              </button>
+            </td>
+
+
           </tr>
           <tr *ngIf="facturas.length === 0">
             <td colspan="6" class="text-center">No hay facturas registradas.</td>
@@ -44,5 +52,5 @@
   </div>
 
 
-  
+
 </div>

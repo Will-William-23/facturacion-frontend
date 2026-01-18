@@ -34,7 +34,7 @@
               <label>Dirección</label>
               <input type="text" class="form-control" [(ngModel)]="form.direccion" name="dir">
             </div>
-            
+
             <div class="d-grid gap-2">
               <button type="submit" class="btn" [ngClass]="editando ? 'btn-dark' : 'btn-warning'">
                 {{ editando ? 'Actualizar' : 'Guardar' }}
@@ -50,7 +50,7 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar proveedor..." [(ngModel)]="searchText">
+          <input type="text" class="form-control" placeholder="🔍 Buscar proveedor..." [(ngModel)]="searchText">
         </div>
         <div class="card-body">
           <table class="table table-hover align-middle">
@@ -63,7 +63,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let p of proveedores | filter:searchText:'nombreEmpresa'">
+              <tr *ngFor="let p of proveedores | filter:searchText:['nombreEmpresa', 'ruc']">
                 <td>{{ p.ruc }}</td>
                 <td>{{ p.nombreEmpresa }}</td>
                 <td>{{ p.contactoNombre }}<br><small class="text-muted">{{ p.telefono }}</small></td>
@@ -78,6 +78,6 @@
       </div>
     </div>
   </div>
-  
- 
+
+
 </div>
