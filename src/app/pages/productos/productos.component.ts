@@ -14,7 +14,7 @@ import { FilterPipe } from '../../pipes/filter.pipe'; // <-- Importar Pipe
   styleUrls: ['./productos.component.css']
 })
 export class ProductosComponent implements OnInit {
-  
+
   productos: Producto[] = [];
   productoForm: Producto = { nombre: '', descripcion: '', precio: 0, stock: 0 };
   editando: boolean = false;
@@ -22,7 +22,7 @@ export class ProductosComponent implements OnInit {
   private contieneLetrasRegex = /[a-zA-Z]/;
 
   // Inyectamos 'cd'
-  constructor(private api: ApiService, private cd: ChangeDetectorRef) {}
+  constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -41,6 +41,17 @@ export class ProductosComponent implements OnInit {
   editarProducto(producto: Producto) {
     this.editando = true;
     this.productoForm = { ...producto };
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.productoForm.imagen = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   guardarProducto() {
@@ -74,7 +85,7 @@ export class ProductosComponent implements OnInit {
   }
 
   eliminarProducto(id: number | undefined) {
-    if(!id) return;
+    if (!id) return;
 
     Swal.fire({
       title: '¿Eliminar producto?',

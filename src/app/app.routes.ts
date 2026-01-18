@@ -12,6 +12,8 @@ import { ContactanosComponent } from './pages/contactanos/contactanos.component'
 import { ProveedoresComponent } from './pages/proveedores/proveedores.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 import { MenuComponent } from './pages/menu/menu.component';
+import { CatalogoComponent } from './pages/catalogo/catalogo.component'; // <--- NEW
+import { CarritoComponent } from './pages/carrito/carrito.component';   // <--- NEW
 import { authGuard } from './guards/auth-guard.component'; // <--- IMPORTAR
 
 export const routes: Routes = [
@@ -35,6 +37,8 @@ export const routes: Routes = [
       { path: 'contactanos', component: ContactanosComponent },
       { path: 'proveedores', component: ProveedoresComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
+      { path: 'catalogo', component: CatalogoComponent }, // <--- NEW
+      { path: 'carrito', component: CarritoComponent },   // <--- NEW
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

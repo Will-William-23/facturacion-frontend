@@ -28,7 +28,21 @@
                 <input type="number" class="form-control" [(ngModel)]="productoForm.stock" name="stock" required>
               </div>
             </div>
-            
+
+            <div class="mb-3">
+              <label>Tipo (Categoría)</label>
+              <input type="text" class="form-control" placeholder="Ej: Lacteo, Hogar..." [(ngModel)]="productoForm.tipo"
+                name="tipo">
+            </div>
+
+            <div class="mb-3">
+              <label>Imagen</label>
+              <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+              <div *ngIf="productoForm.imagen" class="mt-2 text-center">
+                <img [src]="productoForm.imagen" class="img-thumbnail" style="max-height: 100px;">
+              </div>
+            </div>
+
             <div class="d-grid gap-2">
               <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">
                 {{ editando ? 'Actualizar' : 'Guardar' }}
@@ -46,7 +60,7 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar producto..." [(ngModel)]="searchText">
+          <input type="text" class="form-control" placeholder="🔍 Buscar producto..." [(ngModel)]="searchText">
         </div>
         <div class="card-body">
           <table class="table table-striped align-middle">
@@ -80,6 +94,5 @@
     </div>
   </div>
 
- 
-</div>
 
+</div>

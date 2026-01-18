@@ -14,11 +14,11 @@ import Swal from 'sweetalert2'; // Importar alertas
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  
+
   credentials = { username: '', password: '' };
   loading = false;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   onLogin() {
     // Validación básica antes de enviar
@@ -29,18 +29,22 @@ export class LoginComponent {
 
     this.loading = true;
 
-    
+
     this.api.login(this.credentials).subscribe({
       next: (response) => {
         this.api.saveSession(response.jwt, response.username, response.role);
-        
+
         const Toast = Swal.mixin({
           toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true
         });
         Toast.fire({ icon: 'success', title: `Bienvenido ${response.username}` });
 
-        // NAVEGAR AL DASHBOARD
-        this.router.navigate(['/dashboard']);
+        // NAVEGAR SEGÚN ROL
+        if (response.role === 'CLIENTE') {
+          this.router.navigate(['/catalogo']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (err) => {
         this.loading = false;

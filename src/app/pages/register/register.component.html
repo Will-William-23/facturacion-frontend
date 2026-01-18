@@ -4,7 +4,7 @@
       <h3 class="text-center mb-4 text-success fw-bold">
         <i class="bi bi-person-plus-fill me-2"></i> Crear Cuenta
       </h3>
-      
+
       <form (ngSubmit)="onRegister()">
         <div class="mb-3">
           <label class="form-label text-muted">Usuario</label>
@@ -13,18 +13,11 @@
 
         <div class="mb-3">
           <label class="form-label text-muted">Contraseña</label>
-          <input type="password" class="form-control form-control-lg" [(ngModel)]="usuario.password" name="pass" required>
+          <input type="password" class="form-control form-control-lg" [(ngModel)]="usuario.password" name="pass"
+            required>
         </div>
 
-        <div class="mb-4">
-          <label class="form-label text-muted">Rol Solicitado</label>
-          <select class="form-select" [(ngModel)]="usuario.role" name="role">
-            <option value="VENDEDOR">Vendedor</option>
-            <option value="CONTADOR">Contador</option>
-            <!-- Opcional: Permitir crear ADMIN solo si es desarrollo -->
-            <option value="ADMIN">Administrador</option>
-          </select>
-        </div>
+
 
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-success btn-lg" [disabled]="loading">

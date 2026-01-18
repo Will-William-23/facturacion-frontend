@@ -1,0 +1,220 @@
+<div class="min-h-screen bg-gray-50 py-10 selection:bg-teal-100 selection:text-teal-900">
+  <div class="container mx-auto px-4">
+
+    <!-- Header Section -->
+    <div class="text-center mb-16">
+      <span class="text-teal-600 font-bold tracking-wider uppercase text-sm">Bienvenidos a nuestra tienda</span>
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">Catálogo de Productos</h2>
+        <button (click)="logout()" class="text-red-600 hover:text-red-800 font-semibold underline text-sm">
+          Cerrar Sesión
+        </button>
+      </div>
+      <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+        Explora una selección curada de nuestros mejores productos, diseñados para ofrecerte calidad y frescura al mejor
+        precio.
+      </p>
+    </div>
+
+    <!-- ERROR / LOADING STATES -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center my-20 animate-pulse">
+      <div class="w-16 h-16 border-4 border-gray-200 border-t-teal-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-400 font-medium">Cargando catálogo...</p>
+    </div>
+
+    <div *ngIf="errorMsg" class="max-w-md mx-auto bg-white border-l-4 border-red-500 p-6 rounded-r shadow-md mb-10">
+      <div class="flex items-center">
+        <span class="text-red-500 text-2xl mr-4">⚠️</span>
+        <div>
+          <h3 class="text-red-800 font-bold">Error de Conexión</h3>
+          <p class="text-red-600 text-sm mt-1">{{ errorMsg }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !errorMsg && productos.length === 0"
+      class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+      <span class="text-6xl mb-4 block">📭</span>
+      <h3 class="text-2xl font-bold text-gray-800">No hay productos disponibles</h3>
+      <p class="text-gray-500 mt-2">Vuelve más tarde para ver las novedades.</p>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div *ngIf="!loading && productos.length > 0"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+      <div *ngFor="let producto of productos"
+        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 flex flex-col overflow-hidden relative">
+
+        <!-- Image Container -->
+        <div class="relative h-64 overflow-hidden bg-gray-50">
+          <img *ngIf="producto.imagen" [src]="producto.imagen" alt="{{ producto.nombre }}"
+            class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+
+          <div *ngIf="!producto.imagen"
+            class="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
+            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+              </path>
+            </svg>
+          </div>
+
+          <!-- Type Badge -->
+          <span *ngIf="producto.tipo"
+            class="absolute top-4 left-4 bg-white/90 backdrop-blur text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+            {{ producto.tipo }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex-grow">
+            <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight group-hover:text-teal-600 transition-colors">
+              {{ producto.nombre }}
+            </h3>
+            <p class="text-gray-500 text-sm line-clamp-2 mb-4">
+              {{ producto.descripcion || 'Producto de alta calidad.' }}
+            </p>
+          </div>
+
+          <!-- Price & Stock Row -->
+          <div class="flex items-end justify-between mt-4 pt-4 border-t border-gray-50">
+            <div>
+              <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Precio</p>
+              <p class="text-2xl font-black text-gray-900">${{ producto.precio }}</p>
+            </div>
+            <div class="text-right">
+              <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded"
+                [ngClass]="{'bg-red-100 text-red-600': getAvailableStock(producto) === 0}">
+                Stock: {{ getAvailableStock(producto) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button (click)="abrirModal(producto)"
+            class="mt-6 w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-teal-600 hover:shadow-lg transition-all duration-300 flex items-center justify-center group active:scale-95">
+            <span>Ver Detalles</span>
+            <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+              </path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODAL / LIGHTBOX ================= -->
+<div *ngIf="productoSeleccionado" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog"
+  aria-modal="true">
+
+  <!-- Backdrop (Blur) -->
+  <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md transition-opacity animate-fade-in"
+    (click)="cerrarModal()"></div>
+
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden relative z-10 flex flex-col md:flex-row max-h-[90vh] animate-scale-up">
+
+    <!-- Close Button -->
+    <button (click)="cerrarModal()"
+      class="absolute top-5 right-5 z-20 bg-white/50 hover:bg-white text-gray-800 rounded-full p-2 transition backdrop-blur shadow-sm">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <!-- Column 1: Image -->
+    <div class="md:w-1/2 bg-gray-100 flex items-center justify-center p-8 lg:p-12 relative overflow-hidden">
+      <!-- Decorative Circle -->
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white rounded-full opacity-40 blur-3xl">
+      </div>
+
+      <img *ngIf="productoSeleccionado.imagen" [src]="productoSeleccionado.imagen"
+        class="relative z-10 max-h-[50vh] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500">
+
+      <span *ngIf="!productoSeleccionado.imagen" class="text-6xl text-gray-300 relative z-10">Product Image</span>
+    </div>
+
+    <!-- Column 2: Info -->
+    <div class="md:w-1/2 p-8 lg:p-12 flex flex-col overflow-y-auto">
+
+      <!-- Tags -->
+      <div class="flex items-center space-x-2 mb-6">
+        <span *ngIf="productoSeleccionado.tipo"
+          class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+          {{ productoSeleccionado.tipo }}
+        </span>
+        <span *ngIf="productoSeleccionado.stock > 0"
+          class="bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+          En Stock
+        </span>
+        <span *ngIf="productoSeleccionado.stock === 0"
+          class="bg-red-50 text-red-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+          Agotado
+        </span>
+      </div>
+
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
+        {{ productoSeleccionado.nombre }}
+      </h2>
+
+      <div class="flex items-baseline space-x-4 mb-6">
+        <span class="text-4xl font-black text-gray-900">${{ productoSeleccionado.precio }}</span>
+        <span class="text-gray-400 text-sm">impuestos incluidos</span>
+      </div>
+
+      <p class="text-gray-600 text-lg leading-relaxed mb-8 flex-grow">
+        {{ productoSeleccionado.descripcion || 'Este producto destaca por su calidad y excelente precio. Añádelo a tu
+        carrito hoy mismo.' }}
+      </p>
+
+      <!-- Quantity & Add -->
+      <div class="border-t border-gray-100 pt-8 mt-auto">
+        <div class="flex flex-col sm:flex-row gap-4">
+
+          <!-- Qty Control -->
+          <div class="flex items-center bg-gray-50 rounded-xl border border-gray-200 w-fit">
+            <button (click)="decrementarCantidad()"
+              class="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-l-xl transition font-bold text-lg">-</button>
+            <span class="w-12 text-center font-bold text-gray-900 text-lg">{{ cantidadSeleccionada }}</span>
+            <button (click)="incrementarCantidad()"
+              class="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-r-xl transition font-bold text-lg">+</button>
+          </div>
+
+          <!-- Add Button -->
+          <button (click)="agregarAlCarrito()" [disabled]="productoSeleccionado.stock === 0"
+            class="flex-1 bg-gray-900 text-white font-bold py-3 px-6 rounded-xl hover:bg-teal-600 shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none">
+            {{ productoSeleccionado.stock === 0 ? 'Sin Stock' : 'Añadir al Carrito' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING CART BUTTON -->
+<button (click)="irAlCarrito()"
+  class="fixed top-6 right-6 z-50 bg-gray-900 text-white p-4 rounded-full shadow-2xl hover:bg-teal-600 hover:scale-110 transition-all duration-300 flex items-center justify-center group border-2 border-white">
+  <div class="relative">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+      </path>
+    </svg>
+    <span *ngIf="cartItemCount > 0"
+      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full animate-bounce">
+      {{ cartItemCount }}
+    </span>
+  </div>
+</button>

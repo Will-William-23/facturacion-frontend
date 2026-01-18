@@ -16,18 +16,19 @@ export class MainLayoutComponent implements OnInit {
   usuario: string = '';
   rol: string = '';
   rolEtiqueta: string = '';
-  
+
   // VARIABLES DE PERMISOS (Estas son las que faltaban)
   esAdmin: boolean = false;
+  esCliente: boolean = false; // <--- NEW
   canOperate: boolean = false; // Para Vendedor y Admin
   canReport: boolean = false;  // Para Contador y Admin
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit(): void {
     this.usuario = this.api.getUsername() || 'Usuario';
     this.rol = this.api.getRole() || 'INVITADO';
-    
+
     // Configurar etiquetas y permisos según el rol
     if (this.rol === 'ADMIN') {
       this.rolEtiqueta = 'ADMINISTRADOR';
@@ -44,6 +45,9 @@ export class MainLayoutComponent implements OnInit {
       this.canReport = true;
       this.esAdmin = false;
       this.canOperate = false;
+    } else if (this.rol === 'CLIENTE') { // <--- NEW
+      this.rolEtiqueta = 'CLIENTE';
+      this.esCliente = true;
     } else {
       this.rolEtiqueta = 'INVITADO';
     }

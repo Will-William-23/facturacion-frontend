@@ -13,11 +13,11 @@ import Swal from 'sweetalert2';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  
-  usuario = { username: '', password: '', role: 'VENDEDOR' };
+
+  usuario = { username: '', password: '', role: 'CLIENTE' };
   loading = false;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   onRegister() {
     if (!this.usuario.username || !this.usuario.password) {
