@@ -11,7 +11,7 @@
             <th>Cliente</th>
             <th>Total</th>
             <th>Estado SRI</th>
-            <th>Acciones</th> <!-- COLUMNA NUEVA -->
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -26,14 +26,11 @@
                 {{ f.estadoSri || 'PENDIENTE' }}
               </span>
             </td>
-             <!-- BOTÓN NUEVO -->
-      <td>
-        <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
-          <i class="bi bi-file-pdf"></i> PDF
-        </button>
-      </td>
-    
- 
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
+                <i class="bi bi-file-pdf"></i> PDF
+              </button>
+            </td>
           </tr>
           <tr *ngIf="facturas.length === 0">
             <td colspan="6" class="text-center">No hay facturas registradas.</td>
@@ -43,6 +40,4 @@
     </div>
   </div>
 
-
-  
 </div>

@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Importar ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Usuario } from '../../interfaces/usuario';
 import Swal from 'sweetalert2';
@@ -9,7 +8,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css']
 })

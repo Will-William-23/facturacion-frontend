@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Cliente } from '../../interfaces/cliente';
 import { Producto } from '../../interfaces/producto';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2'; // Importamos SweetAlert
 @Component({
   selector: 'app-facturacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './facturacion.component.html',
   styleUrls: ['./facturacion.component.css']
 })
@@ -26,6 +26,23 @@ export class FacturacionComponent implements OnInit {
 
   carrito: DetalleVenta[] = [];
   total: number = 0;
+
+  // Método de Pago
+  metodoPago: 'efectivo' | 'tarjeta' | 'transferencia' = 'efectivo';
+  
+  // Efectivo
+  montoRecibido: number = 0;
+  cambio: number = 0;
+  
+  // Tarjeta
+  tipoTarjeta: 'visa' | 'mastercard' = 'visa';
+  ultimosCuatroDigitos: string = '';
+  codigoAutorizacion: string = '';
+  
+  // Transferencia
+  banco: string = '';
+  numeroComprobante: string = '';
+  fechaPago: string = '';
 
   constructor(private api: ApiService, private router: Router) {}
 
@@ -78,9 +95,57 @@ export class FacturacionComponent implements OnInit {
     this.total = this.carrito.reduce((sum, item) => sum + (item.subtotal || 0), 0);
   }
 
+  cambiarMetodoPago(metodo: 'efectivo' | 'tarjeta' | 'transferencia') {
+    this.metodoPago = metodo;
+    this.limpiarCamposPago();
+  }
+
+  limpiarCamposPago() {
+    this.montoRecibido = 0;
+    this.cambio = 0;
+    this.tipoTarjeta = 'visa';
+    this.ultimosCuatroDigitos = '';
+    this.codigoAutorizacion = '';
+    this.banco = '';
+    this.numeroComprobante = '';
+    this.fechaPago = '';
+  }
+
+  calcularCambio() {
+    if (this.montoRecibido >= this.total) {
+      this.cambio = this.montoRecibido - this.total;
+    } else {
+      this.cambio = 0;
+    }
+  }
+
+  validarMetodoPago(): boolean {
+    if (this.metodoPago === 'efectivo') {
+      if (this.montoRecibido < this.total) {
+        Swal.fire('Monto Insuficiente', 'El monto recibido debe ser mayor o igual al total.', 'warning');
+        return false;
+      }
+    } else if (this.metodoPago === 'tarjeta') {
+      if (!this.ultimosCuatroDigitos || !this.codigoAutorizacion) {
+        Swal.fire('Campos Incompletos', 'Complete los datos de la tarjeta.', 'warning');
+        return false;
+      }
+    } else if (this.metodoPago === 'transferencia') {
+      if (!this.banco || !this.numeroComprobante || !this.fechaPago) {
+        Swal.fire('Campos Incompletos', 'Complete los datos de la transferencia.', 'warning');
+        return false;
+      }
+    }
+    return true;
+  }
+
   procesarFactura() {
     if (!this.clienteSeleccionado || this.carrito.length === 0) {
       Swal.fire('Faltan Datos', 'Seleccione un cliente y agregue productos al carrito.', 'warning');
+      return;
+    }
+
+    if (!this.validarMetodoPago()) {
       return;
     }
 
@@ -91,12 +156,30 @@ export class FacturacionComponent implements OnInit {
       didOpen: () => { Swal.showLoading(); }
     });
 
+    // Preparar detalles del pago según el método
+    let detallesPago: any = { metodoPago: this.metodoPago };
+    
+    if (this.metodoPago === 'efectivo') {
+      detallesPago.montoRecibido = this.montoRecibido;
+      detallesPago.cambio = this.cambio;
+    } else if (this.metodoPago === 'tarjeta') {
+      detallesPago.tipoTarjeta = this.tipoTarjeta;
+      detallesPago.ultimosCuatroDigitos = this.ultimosCuatroDigitos;
+      detallesPago.codigoAutorizacion = this.codigoAutorizacion;
+    } else if (this.metodoPago === 'transferencia') {
+      detallesPago.banco = this.banco;
+      detallesPago.numeroComprobante = this.numeroComprobante;
+      detallesPago.fechaPago = this.fechaPago;
+    }
+
     const factura: FacturaRequest = {
       cliente: { id: this.clienteSeleccionado },
       detalles: this.carrito.map(item => ({
         producto: { id: item.producto.id },
         cantidad: item.cantidad
-      }))
+      })),
+      metodoPago: this.metodoPago,
+      detallesPago: detallesPago
     };
 
     this.api.crearFactura(factura).subscribe({
@@ -124,14 +207,17 @@ export class FacturacionComponent implements OnInit {
         });
       },
       error: (e) => {
-        console.error(e);
-        Swal.fire('Error', 'No se pudo procesar la factura. Verifique conexión o stock.', 'error');
+        console.error('Error completo:', e);
+        console.error('Mensaje:', e.error);
+        const errorMsg = e.error && typeof e.error === 'string' ? e.error : 'No se pudo procesar la factura. Verifique conexión o stock.';
+        Swal.fire('Error', errorMsg, 'error');
       }
     });
   }
 
   limpiarFormulario() {
     this.carrito = [];
+    this.limpiarCamposPago();
     this.total = 0;
     this.clienteSeleccionado = null;
     this.productoSeleccionado = null;

@@ -7,4 +7,6 @@ export interface DetalleVenta {
 export interface FacturaRequest {
     cliente: { id: number };
     detalles: DetalleVenta[];
+    metodoPago: string; // "efectivo" | "tarjeta" | "transferencia"
+    detallesPago?: any; // Datos adicionales del método de pago
 }
