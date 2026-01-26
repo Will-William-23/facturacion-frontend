@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <h2 class="text-danger mb-4"><i class="bi bi-shield-lock"></i> Gestión de Usuarios y Roles</h2>
+
+  <div class="row">
+    <!-- Formulario -->
+    <div class="col-md-4 mb-4">
+        <!-- ... (contenido del formulario igual que antes) ... -->
+        <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+          {{ editando ? 'Editar Credenciales' : 'Registrar Nuevo Usuario' }}
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="guardarUsuario()">
+            <div class="mb-3">
+              <label>Nombre de Usuario</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" [(ngModel)]="usuarioForm.username" name="username" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label>Contraseña</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control" [(ngModel)]="usuarioForm.password" name="password" 
+                       [placeholder]="editando ? '(Vacío para no cambiar)' : 'Nueva contraseña'">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label>Rol / Permisos</label>
+              <select class="form-select" [(ngModel)]="usuarioForm.role" name="role">
+                <option value="ADMIN">ADMINISTRADOR</option>
+                <option value="VENDEDOR">VENDEDOR</option>
+                <option value="CONTADOR">CONTADOR</option>
+              </select>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-dark' : 'btn-danger'">
+                {{ editando ? 'Actualizar Acceso' : 'Crear Usuario' }}
+              </button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="col-md-8">
+        <!-- ... (contenido de la tabla igual que antes) ... -->
+        <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <input type="text" class="form-control" placeholder="🔍 Buscar usuario..." [(ngModel)]="searchText">
+        </div>
+        <div class="card-body">
+          <table class="table table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Rol Asignado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuarios | filter:searchText:'username'">
+                <td>{{ u.id }}</td>
+                <td class="fw-bold">{{ u.username }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{'bg-danger': u.role === 'ADMIN', 'bg-success': u.role === 'VENDEDOR'}">{{ u.role }}</span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-dark me-2" (click)="editarUsuario(u)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarUsuario(u.id)"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- AQUÍ YA NO HAY BOTÓN VOLVER -->
+</div>

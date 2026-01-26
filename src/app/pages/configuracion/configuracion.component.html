@@ -1,0 +1,60 @@
+<div class="container mt-4">
+  <h2 class="text-secondary mb-4"><i class="bi bi-gear"></i> Configuración del Sistema</h2>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">Datos de la Empresa (Para SRI y Facturas)</div>
+    <div class="card-body">
+      <form (ngSubmit)="guardar()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Razón Social / Nombre</label>
+            <input type="text" class="form-control" [(ngModel)]="config.nombreEmpresa" name="nombre" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>RUC (13 Dígitos)</label>
+            <input type="text" class="form-control" [(ngModel)]="config.ruc" name="ruc" maxlength="13" required>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label>Dirección Matriz</label>
+          <input type="text" class="form-control" [(ngModel)]="config.direccion" name="dir" required>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label>Teléfono</label>
+            <input type="text" class="form-control" [(ngModel)]="config.telefono" name="telf">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Email Corporativo</label>
+            <input type="email" class="form-control" [(ngModel)]="config.email" name="email">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Sitio Web</label>
+            <input type="text" class="form-control" [(ngModel)]="config.sitioWeb" name="web" placeholder="[www.miempresa.com](https://www.miempresa.com)">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Obligado a Llevar Contabilidad</label>
+            <select class="form-select" [(ngModel)]="config.obligadoContabilidad" name="contabilidad">
+              <option value="SI">SI</option>
+              <option value="NO">NO</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>IVA (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="config.ivaPorcentaje" name="iva" step="0.1">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <a routerLink="/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary px-5">💾 Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

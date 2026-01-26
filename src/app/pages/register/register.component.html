@@ -1,0 +1,41 @@
+<div class="container d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow-lg p-4 border-0" style="width: 400px;">
+    <div class="card-body">
+      <h3 class="text-center mb-4 text-success fw-bold">
+        <i class="bi bi-person-plus-fill me-2"></i> Crear Cuenta
+      </h3>
+      
+      <form (ngSubmit)="onRegister()">
+        <div class="mb-3">
+          <label class="form-label text-muted">Usuario</label>
+          <input type="text" class="form-control form-control-lg" [(ngModel)]="usuario.username" name="user" required placeholder="Ej: invitado">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted">Contraseña</label>
+          <input type="password" class="form-control form-control-lg" [(ngModel)]="usuario.password" name="pass" required placeholder="******">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label text-muted">Tipo de Cuenta</label>
+          <select class="form-select form-select-lg" [(ngModel)]="usuario.role" name="role">
+            <!-- NUEVA OPCIÓN: CLIENTE (Por defecto) -->
+            <option value="CLIENTE">Cliente / Invitado (Comprar)</option>
+            
+            <!-- Opciones Administrativas -->
+            <option value="VENDEDOR">Vendedor (Facturar)</option>
+            <option value="CONTADOR">Contador (Reportes)</option>
+            <option value="ADMIN">Administrador (Total)</option>
+          </select>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-success btn-lg" [disabled]="loading">
+            {{ loading ? 'Registrando...' : 'Registrarse' }}
+          </button>
+          <a routerLink="/login" class="btn btn-outline-secondary">Volver al Login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

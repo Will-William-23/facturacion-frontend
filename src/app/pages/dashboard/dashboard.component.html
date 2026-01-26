@@ -1,0 +1,106 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="text-dark fw-bold mb-0">Monitor de Sistema</h2>
+      <small class="text-muted">Actualización en tiempo real vía WebSocket</small>
+    </div>
+    
+    <!-- ETIQUETA DINÁMICA DE CONEXIÓN -->
+    <div class="badge p-2 border" 
+         [ngClass]="conectado ? 'bg-success bg-opacity-10 text-success border-success' : 'bg-danger bg-opacity-10 text-danger border-danger'">
+      
+      <span class="spinner-grow spinner-grow-sm me-2" role="status" *ngIf="conectado"></span>
+      <i class="bi bi-exclamation-triangle-fill me-2" *ngIf="!conectado"></i>
+      
+      {{ conectado ? 'Servidor Conectado' : 'Servidor Desconectado' }}
+      
+      <span class="badge rounded-pill ms-2" [ngClass]="conectado ? 'bg-success' : 'bg-secondary'">
+        {{ conectado ? 'LIVE' : 'OFF' }}
+      </span>
+    </div>
+
+  </div>
+
+  <!-- FILA 1: KPIs -->
+  <div class="row g-3 mb-4">
+    <!-- Ventas -->
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Ventas Totales</h6>
+          <h3 class="fw-bold text-primary mb-0">${{ ventasTotales | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clientes -->
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Clientes Activos</h6>
+          <h3 class="fw-bold text-success mb-0">{{ totalClientes }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Productos -->
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Productos en Stock</h6>
+          <h3 class="fw-bold text-warning mb-0">{{ totalProductos }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuarios -->
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small">Usuarios Sistema</h6>
+          <h3 class="fw-bold text-info mb-0">{{ usuariosConectados }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILA 2: GRÁFICA Y CPU -->
+  <div class="row g-4">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3 d-flex justify-content-between">
+          <h6 class="mb-0 fw-bold"><i class="bi bi-activity me-2"></i>Actividad de Transacciones</h6>
+          <small *ngIf="!conectado" class="text-danger fw-bold">Sin señal...</small>
+        </div>
+        <div class="card-body position-relative">
+          <!-- Overlay de desconexión -->
+          <div *ngIf="!conectado" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75" style="z-index: 10;">
+            <div class="text-center text-danger">
+              <i class="bi bi-wifi-off display-1"></i>
+              <p class="fw-bold mt-2">Esperando servidor...</p>
+            </div>
+          </div>
+          
+          <div style="height: 300px;">
+            <canvas #ventasChart></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100" [ngClass]="conectado ? 'bg-dark text-white' : 'bg-secondary text-white'">
+        <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+          <h1 class="display-1 fw-bold mb-0">{{ cpuUso | number:'1.0-0' }}%</h1>
+          <p class="text-white-50">Carga de CPU (Servidor)</p>
+          <div class="progress w-100 bg-secondary" style="height: 10px;">
+            <div class="progress-bar" [ngClass]="conectado ? 'bg-danger' : 'bg-dark'" [style.width.%]="cpuUso"></div>
+          </div>
+          <div class="mt-4 small text-white-50">
+            <i class="bi bi-hdd-rack me-2"></i> {{ conectado ? 'Spring Boot Server 4.2.3' : 'Servidor Inalcanzable' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

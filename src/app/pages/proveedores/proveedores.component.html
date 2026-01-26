@@ -1,0 +1,99 @@
+<div class="container mt-4">
+  <h2 class="text-warning mb-4"><i class="bi bi-truck"></i> Gestión de Proveedores</h2>
+
+  <div class="row">
+    <!-- Formulario -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning text-dark fw-bold">
+          {{ editando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="guardar()">
+            <div class="mb-2">
+              <label>RUC (13 Dígitos)</label>
+              <input type="text" class="form-control" [(ngModel)]="form.ruc" name="ruc" maxlength="13" required placeholder="Ej: 17...001">
+            </div>
+            
+            <div class="mb-2">
+              <label>Categoría</label>
+              <select class="form-select" [(ngModel)]="form.categoria" name="cat">
+                <option value="General">General</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Insumos">Insumos de Oficina</option>
+                <option value="Servicios">Servicios Básicos</option>
+                <option value="Alimentos">Alimentos</option>
+              </select>
+            </div>
+
+            <div class="mb-2">
+              <label>Empresa</label>
+              <input type="text" class="form-control" [(ngModel)]="form.nombreEmpresa" name="empresa" required>
+            </div>
+            <div class="mb-2">
+              <label>Contacto (Persona)</label>
+              <input type="text" class="form-control" [(ngModel)]="form.contactoNombre" name="contacto">
+            </div>
+            <div class="mb-2">
+              <label>Teléfono</label>
+              <input type="text" class="form-control" [(ngModel)]="form.telefono" name="telefono">
+            </div>
+            <div class="mb-2">
+              <label>Email</label>
+              <input type="email" class="form-control" [(ngModel)]="form.email" name="email">
+            </div>
+            <div class="mb-3">
+              <label>Dirección</label>
+              <input type="text" class="form-control" [(ngModel)]="form.direccion" name="dir">
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-dark' : 'btn-warning'">
+                {{ editando ? 'Actualizar' : 'Guardar' }}
+              </button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <input type="text" class="form-control" placeholder="🔍 Buscar..." [(ngModel)]="searchText">
+        </div>
+        <div class="card-body">
+          <table class="table table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>RUC / Categoría</th>
+                <th>Empresa</th>
+                <th>Contacto</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of proveedores | filter:searchText:'nombreEmpresa':'ruc':'contactoNombre':'categoria':'telefono':'email':'direccion'">
+                <td>
+                  <div class="fw-bold">{{ p.ruc }}</div>
+                  <span class="badge bg-secondary">{{ p.categoria || 'General' }}</span>
+                </td>
+                <td>{{ p.nombreEmpresa }}</td>
+                <td>
+                  <div>{{ p.contactoNombre }}</div>
+                  <small class="text-muted"><i class="bi bi-telephone"></i> {{ p.telefono }}</small>
+                </td>
+                <td>
+                  <button class="btn btn-warning btn-sm me-2" (click)="editar(p)">✏️</button>
+                  <button class="btn btn-danger btn-sm" (click)="eliminar(p.id)">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

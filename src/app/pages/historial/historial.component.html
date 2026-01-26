@@ -1,0 +1,91 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary"><i class="bi bi-clock-history"></i> Historial de Ventas</h2>
+    
+    <!-- TARJETA DE TOTAL DEL PERIODO -->
+    <div class="card bg-success text-white shadow-sm" style="min-width: 200px;">
+      <div class="card-body p-2 text-center">
+        <small>Total en Pantalla</small>
+        <h4 class="mb-0 fw-bold">${{ totalPeriodo | number:'1.2-2' }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS -->
+  <div class="card shadow-sm mb-3 bg-light border-0">
+    <div class="card-body py-2">
+      <div class="row align-items-center">
+        <div class="col-md-auto fw-bold text-secondary">
+          <i class="bi bi-funnel-fill me-1"></i> Filtrar por Fecha:
+        </div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" [(ngModel)]="fechaInicio">
+        </div>
+        <div class="col-md-auto text-center">a</div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" [(ngModel)]="fechaFin">
+        </div>
+        <div class="col-md-auto">
+          <button class="btn btn-primary me-2" (click)="filtrar()">Buscar</button>
+          <button class="btn btn-outline-secondary" (click)="limpiarFiltro()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA (Igual que antes) -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado SRI</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of facturas">
+              <td class="fw-bold">{{ f.id }}</td>
+              <td>
+                <div>{{ f.fecha | date:'dd/MM/yyyy' }}</div>
+                <small class="text-muted">{{ f.fecha | date:'shortTime' }}</small>
+              </td>
+              <td>
+                {{ f.cliente.nombre }} {{ f.cliente.apellido }}
+                <br><small class="text-muted">{{ f.cliente.cedula }}</small>
+              </td>
+              <td class="fw-bold text-success">${{ f.total | number:'1.2-2' }}</td>
+              <td>
+                <span class="badge" 
+                  [ngClass]="{
+                    'bg-success': f.estadoSri === 'AUTORIZADO',
+                    'bg-danger': f.estadoSri === 'DEVUELTA',
+                    'bg-warning text-dark': !f.estadoSri || f.estadoSri === 'PENDIENTE'
+                  }">
+                  {{ f.estadoSri || 'PENDIENTE' }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="verDetalle(f)" title="Ver Productos">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)" title="Descargar PDF">
+                  <i class="bi bi-file-pdf"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="facturas.length === 0">
+              <td colspan="6" class="text-center py-5 text-muted">No se encontraron ventas en este periodo.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,50 @@
+<div class="container d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow p-4 border-0" style="width: 400px;">
+    <div class="card-body">
+      <h3 class="text-center mb-4 text-primary fw-bold">
+        <i class="bi bi-shield-lock me-2"></i> Acceso
+      </h3>
+      
+      <form (ngSubmit)="onLogin()">
+        <!-- Usuario -->
+        <div class="mb-3">
+          <label for="username" class="form-label text-muted">Usuario</label>
+          <input type="text" 
+                 class="form-control form-control-lg" 
+                 id="username" 
+                 [(ngModel)]="credentials.username" 
+                 name="username" 
+                 placeholder=""
+                 required>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-4">
+          <label for="password" class="form-label text-muted">Contraseña</label>
+          <input type="password" 
+                 class="form-control form-control-lg" 
+                 id="password" 
+                 [(ngModel)]="credentials.password" 
+                 name="password" 
+                 placeholder=""
+                 required>
+        </div>
+
+        <!-- Botón -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading">
+            {{ loading ? 'Verificando...' : 'Iniciar Sesión' }}
+          </button>
+        </div>
+      </form>
+<div class="mt-3 text-center">
+          <span class="text-muted">¿No tienes cuenta?</span>
+          <a routerLink="/register" class="text-decoration-none fw-bold ms-1">Regístrate aquí</a>
+        </div>
+
+    </div>
+    <div class="card-footer text-center bg-white border-0 text-muted small">
+      Sistema de Administracion Version 4.0
+    </div>
+  </div>
+</div>
