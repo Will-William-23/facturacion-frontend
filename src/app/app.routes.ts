@@ -30,12 +30,13 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'menu', component: MenuComponent },
       { path: 'clientes', component: ClientesComponent },
-      { path: 'productos', component: ProductosComponent },
+      { path: 'productos', component: ProductosComponent, canActivate: [authGuard] },
       { path: 'facturacion', component: FacturacionComponent },
-      { path: 'usuarios', component: UsuariosComponent },
+      { path: 'usuarios', component: UsuariosComponent, canActivate: [authGuard] },
       { path: 'historial', component: HistorialComponent },
       { path: 'contactanos', component: ContactanosComponent },
-      { path: 'proveedores', component: ProveedoresComponent },
+      { path: 'proveedores', component: ProveedoresComponent, canActivate: [authGuard] },
+      { path: 'abastecimiento', loadComponent: () => import('./pages/abastecimiento/abastecimiento.component').then(m => m.AbastecimientoComponent), canActivate: [authGuard] }, // Lazy load
       { path: 'configuracion', component: ConfiguracionComponent },
       { path: 'catalogo', component: CatalogoComponent }, // <--- NEW
       { path: 'carrito', component: CarritoComponent },   // <--- NEW

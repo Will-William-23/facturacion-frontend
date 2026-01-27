@@ -1,42 +1,47 @@
 <div class="container mt-4">
-  <h2 class="text-success mb-4">Inventario de Productos</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-success"><i class="bi bi-box-seam"></i> Inventario de Productos</h2>
+    <a class="btn btn-primary" routerLink="/abastecimiento">
+      <i class="bi bi-cart-plus"></i> Abastecer de Proveedor
+    </a>
+  </div>
 
   <div class="row">
     <!-- Formulario -->
     <div class="col-md-4 mb-4">
       <div class="card shadow-sm border-success">
-        <div class="card-header bg-success text-white">
+        <div class="card-header bg-success text-white fw-bold">
           {{ editando ? 'Editar Producto' : 'Nuevo Producto' }}
         </div>
         <div class="card-body">
           <form (ngSubmit)="guardarProducto()">
             <div class="mb-2">
-              <label>Nombre</label>
+              <label class="form-label">Nombre</label>
               <input type="text" class="form-control" [(ngModel)]="productoForm.nombre" name="nombre" required>
             </div>
             <div class="mb-2">
-              <label>Descripción</label>
+              <label class="form-label">Descripción</label>
               <input type="text" class="form-control" [(ngModel)]="productoForm.descripcion" name="descripcion">
             </div>
             <div class="row">
               <div class="col-6 mb-2">
-                <label>Precio ($)</label>
+                <label class="form-label">Precio ($)</label>
                 <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio" required>
               </div>
               <div class="col-6 mb-3">
-                <label>Stock</label>
+                <label class="form-label">Stock</label>
                 <input type="number" class="form-control" [(ngModel)]="productoForm.stock" name="stock" required>
               </div>
             </div>
 
             <div class="mb-3">
-              <label>Tipo (Categoría)</label>
+              <label class="form-label">Tipo (Categoría)</label>
               <input type="text" class="form-control" placeholder="Ej: Lacteo, Hogar..." [(ngModel)]="productoForm.tipo"
                 name="tipo">
             </div>
 
             <div class="mb-3">
-              <label>Imagen</label>
+              <label class="form-label">Imagen</label>
               <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
               <div *ngIf="productoForm.imagen" class="mt-2 text-center">
                 <img [src]="productoForm.imagen" class="img-thumbnail" style="max-height: 100px;">
@@ -75,7 +80,17 @@
             <tbody>
               <!-- Filtro aplicado aquí -->
               <tr *ngFor="let p of productos | filter:searchText:'nombre'">
-                <td>{{ p.nombre }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img *ngIf="p.imagen" [src]="p.imagen" alt="img" class="me-2 rounded"
+                      style="width: 40px; height: 40px; object-fit: cover;">
+                    <i *ngIf="!p.imagen" class="bi bi-box me-2 fs-4 text-muted"></i>
+                    <div>
+                      <div class="fw-bold">{{ p.nombre }}</div>
+                      <small class="text-muted">{{ p.tipo || 'General' }}</small>
+                    </div>
+                  </div>
+                </td>
                 <td>${{ p.precio }}</td>
                 <td>
                   <span class="badge" [ngClass]="p.stock < 5 ? 'bg-danger' : 'bg-success'">
@@ -94,5 +109,54 @@
     </div>
   </div>
 
+  <!-- MODAL ABASTECER -->
+  <div class="modal d-block" tabindex="-1" *ngIf="mostrarModalAbastecer" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Abastecer Inventario</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cerrarAbastecer()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="guardarAbastecimiento()">
+            <div class="mb-3">
+              <label class="form-label">Proveedor</label>
+              <select class="form-select" [(ngModel)]="restockForm.proveedorId" name="prov"
+                (change)="onProveedorChange()" required>
+                <option [ngValue]="null">Seleccione Proveedor...</option>
+                <option *ngFor="let prov of proveedores" [value]="prov.id">
+                  {{ prov.nombreEmpresa }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3" *ngIf="restockForm.proveedorId">
+              <label class="form-label">Producto del Proveedor</label>
+              <select class="form-select" [(ngModel)]="restockForm.productoId" name="prod" required>
+                <option [ngValue]="null">Seleccione Producto...</option>
+                <option *ngFor="let prod of productosDelProveedor" [value]="prod.id">
+                  {{ prod.nombre }} (Stock: {{ prod.stock }})
+                </option>
+              </select>
+              <div *ngIf="productosDelProveedor.length === 0" class="form-text text-danger">
+                Este proveedor no tiene productos asignados.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Cantidad a Agregar</label>
+              <input type="number" class="form-control" [(ngModel)]="restockForm.cantidad" name="cant" min="1" required>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="cerrarAbastecer()">Cancelar</button>
+              <button type="submit" class="btn btn-primary"
+                [disabled]="!restockForm.productoId || restockForm.cantidad <= 0">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>

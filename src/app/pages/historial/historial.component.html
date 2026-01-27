@@ -1,5 +1,20 @@
 <div class="container mt-4">
-  <h2 class="text-primary mb-4">Historial de Ventas</h2>
+  <h2 class="text-primary mb-4"><i class="bi bi-clock-history"></i> Historial de Transacciones</h2>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="tipoSeleccionado === 'VENTA'" (click)="tipoSeleccionado = 'VENTA'"
+        role="button">
+        <i class="bi bi-cart"></i> Ventas (Clientes)
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="tipoSeleccionado === 'COMPRA'" (click)="tipoSeleccionado = 'COMPRA'"
+        role="button">
+        <i class="bi bi-box-seam"></i> Reabastecimiento (Proveedores)
+      </a>
+    </li>
+  </ul>
 
   <div class="card shadow-sm">
     <div class="card-body">
@@ -8,41 +23,39 @@
           <tr>
             <th>#</th>
             <th>Fecha</th>
-            <th>Cliente</th>
+            <th>{{ tipoSeleccionado === 'VENTA' ? 'Cliente' : 'Proveedor' }}</th>
             <th>Total</th>
             <th>Estado SRI</th>
-            <th>Acciones</th> <!-- COLUMNA NUEVA -->
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let f of facturas">
+          <tr *ngFor="let f of facturasFiltradas">
             <td>{{ f.id }}</td>
             <td>{{ f.fecha | date:'short' }}</td>
-            <td>{{ f.cliente.nombre }} {{ f.cliente.apellido }}</td>
+            <td>
+              <span *ngIf="f.cliente">{{ f.cliente.nombre }} {{ f.cliente.apellido }}</span>
+              <span *ngIf="f.proveedor">{{ f.proveedor.nombreEmpresa }}</span>
+            </td>
             <td class="fw-bold">${{ f.total | number:'1.2-2' }}</td>
             <td>
-              <span class="badge" 
-                [ngClass]="f.estadoSri === 'AUTORIZADO' ? 'bg-success' : 'bg-danger'">
+              <span class="badge"
+                [ngClass]="f.estadoSri === 'AUTORIZADO' ? 'bg-success' : (f.estadoSri === 'ENVIADO_SRI' ? 'bg-warning' : 'bg-danger')">
                 {{ f.estadoSri || 'PENDIENTE' }}
               </span>
             </td>
-             <!-- BOTÓN NUEVO -->
-      <td>
-        <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
-          <i class="bi bi-file-pdf"></i> PDF
-        </button>
-      </td>
-    
- 
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="descargarPDF(f.id)">
+                <i class="bi bi-file-pdf"></i> PDF
+              </button>
+            </td>
           </tr>
-          <tr *ngIf="facturas.length === 0">
-            <td colspan="6" class="text-center">No hay facturas registradas.</td>
+          <tr *ngIf="facturasFiltradas.length === 0">
+            <td colspan="6" class="text-center p-4 text-muted">No hay registros de {{ tipoSeleccionado === 'VENTA' ?
+              'ventas' : 'compras' }}.</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-
-
-  
 </div>

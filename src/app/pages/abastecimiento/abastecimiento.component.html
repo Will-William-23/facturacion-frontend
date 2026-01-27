@@ -1,0 +1,102 @@
+<div class="container mt-4">
+    <h2 class="text-primary mb-4"><i class="bi bi-box-seam-fill"></i> Abastecimiento de Inventario</h2>
+
+    <div class="row">
+        <!-- LISTA DE PROVEEDORES -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    Proveedores Disponibles
+                </div>
+                <div class="list-group list-group-flush">
+                    <button *ngFor="let prov of proveedores"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                        [class.active]="proveedorSeleccionado?.id === prov.id" (click)="seleccionarProveedor(prov)">
+                        <div>
+                            <div class="fw-bold">{{ prov.nombreEmpresa }}</div>
+                            <small>{{ prov.ruc }}</small>
+                        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <div *ngIf="proveedores.length === 0" class="p-3 text-muted text-center">
+                        No hay proveedores registrados.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTA DE PRODUCTOS DEL PROVEEDOR -->
+        <div class="col-md-8">
+            <div class="card shadow" *ngIf="proveedorSeleccionado; else noSeleccion">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span>Productos de: <strong>{{ proveedorSeleccionado.nombreEmpresa }}</strong></span>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <select class="form-select form-select-sm" [(ngModel)]="metodoPagoSeleccionado"
+                            style="width: 200px;">
+                            <option [ngValue]="null" disabled selected>Método de Pago</option>
+                            <option *ngFor="let m of metodosPago" [value]="m.id">{{ m.descripcion }}</option>
+                        </select>
+                        <button class="btn btn-light btn-sm fw-bold" (click)="guardarAbastecimiento()">
+                            <i class="bi bi-save"></i> Confirmar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center">Stock Actual</th>
+                                    <th class="text-center" style="width: 200px;">Cantidad a Agregar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let prod of productosDelProveedor">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img *ngIf="prod.imagen" [src]="prod.imagen" class="me-2 rounded"
+                                                style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ prod.nombre }}</div>
+                                                <small class="text-muted">Costo: ${{ prod.precioCompra || 0 }} | Venta:
+                                                    ${{ prod.precio }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary fs-6">{{ prod.stock }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                (click)="ajustarCantidad(prod, -1)">-</button>
+                                            <input type="number" class="form-control text-center"
+                                                [value]="cantidades[prod.id!] || 0" readonly>
+                                            <button class="btn btn-outline-primary" type="button"
+                                                (click)="ajustarCantidad(prod, 1)">+</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="productosDelProveedor.length === 0">
+                                    <td colspan="3" class="text-center p-4 text-muted">
+                                        Este proveedor no tiene productos asignados o no se encontraron.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #noSeleccion>
+                <div class="alert alert-info text-center mt-5 shadow-sm">
+                    <h4><i class="bi bi-arrow-left-circle"></i> Seleccione un proveedor</h4>
+                    <p>Haga clic en un proveedor de la lista izquierda para ver sus productos y gestionar el
+                        abastecimiento.</p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

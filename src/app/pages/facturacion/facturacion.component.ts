@@ -5,8 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Cliente } from '../../interfaces/cliente';
 import { Producto } from '../../interfaces/producto';
+import { MetodoPago } from '../../interfaces/metodo-pago';
 import { DetalleVenta, FacturaRequest } from '../../interfaces/factura';
-import Swal from 'sweetalert2'; // Importamos SweetAlert
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-facturacion',
@@ -19,15 +20,17 @@ export class FacturacionComponent implements OnInit {
 
   clientes: Cliente[] = [];
   productos: Producto[] = [];
+  metodosPago: MetodoPago[] = [];
 
   clienteSeleccionado: number | null = null;
   productoSeleccionado: number | null = null;
+  metodoPagoSeleccionado: number | null = null;
   cantidad: number = 1;
 
   carrito: DetalleVenta[] = [];
   total: number = 0;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -36,6 +39,12 @@ export class FacturacionComponent implements OnInit {
   cargarDatos() {
     this.api.get('clientes').subscribe(data => this.clientes = data);
     this.api.get('productos').subscribe(data => this.productos = data);
+    this.api.get('api/metodos-pago').subscribe(data => {
+      this.metodosPago = data;
+      // Seleccionar efectivo por defecto
+      const efectivo = data.find((m: any) => m.codigo === '01');
+      if (efectivo) this.metodoPagoSeleccionado = efectivo.id;
+    });
   }
 
   agregarProducto() {
@@ -58,7 +67,7 @@ export class FacturacionComponent implements OnInit {
       });
 
       this.calcularTotal();
-      
+
       const Toast = Swal.mixin({
         toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true
       });
@@ -84,6 +93,11 @@ export class FacturacionComponent implements OnInit {
       return;
     }
 
+    if (!this.metodoPagoSeleccionado) {
+      Swal.fire('Falta Método de Pago', 'Seleccione un método de pago.', 'warning');
+      return;
+    }
+
     Swal.fire({
       title: 'Procesando...',
       text: 'Autorizando en SRI y enviando WhatsApp...',
@@ -91,23 +105,23 @@ export class FacturacionComponent implements OnInit {
       didOpen: () => { Swal.showLoading(); }
     });
 
-    const factura: FacturaRequest = {
-      cliente: { id: this.clienteSeleccionado },
-      detalles: this.carrito.map(item => ({
-        producto: { id: item.producto.id },
+    const factura: any = {
+      clienteId: this.clienteSeleccionado,
+      metodoPagoId: this.metodoPagoSeleccionado,
+      items: this.carrito.map(item => ({
+        productoId: item.producto.id,
         cantidad: item.cantidad
       }))
     };
 
-    this.api.crearFactura(factura).subscribe({
+    // CAMBIO CRITICO: Usar el endpoint de ventas, no el de facturas antiguo
+    this.api.post('ventas/comprar', factura).subscribe({
       next: (resp) => {
         Swal.fire({
-          title: '¡Factura Exitosa!',
+          title: '¡Venta Exitosa!',
           html: `
-            <p><strong>ID Factura:</strong> ${resp.id}</p>
-            <p><strong>Estado SRI:</strong> ${resp.estadoSri}</p>
-            <br>
-            <span class="text-success">✅ Notificación de WhatsApp enviada</span>
+            <p><strong>ID Venta:</strong> ${resp.id}</p>
+            <span class="text-success">✅ Factura SRI generada automáticamente</span>
           `,
           icon: 'success',
           showCancelButton: true,
@@ -125,7 +139,7 @@ export class FacturacionComponent implements OnInit {
       },
       error: (e) => {
         console.error(e);
-        Swal.fire('Error', 'No se pudo procesar la factura. Verifique conexión o stock.', 'error');
+        Swal.fire('Error', 'No se pudo procesar la venta. Verifique conexión o stock.', 'error');
       }
     });
   }

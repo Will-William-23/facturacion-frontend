@@ -34,7 +34,72 @@
               <label>Dirección</label>
               <input type="text" class="form-control" [(ngModel)]="form.direccion" name="dir">
             </div>
-            
+
+            <!-- ... existing fields ... -->
+            <div class="mb-3">
+              <label>Dirección</label>
+              <input type="text" class="form-control" [(ngModel)]="form.direccion" name="dir">
+            </div>
+
+            <!-- SECCIÓN PRODUCTOS -->
+            <div class="border-top pt-3 mt-3 bg-light p-2 rounded">
+              <h6 class="text-primary mb-3"><i class="bi bi-box-fill"></i> Agregar Productos</h6>
+
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Nombre del Producto</label>
+                <input type="text" class="form-control" placeholder="Ej: Coca Cola 3L"
+                  [(ngModel)]="nuevoProducto.nombre" name="prodNombre">
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-6">
+                  <label class="form-label small fw-bold text-success">Precio Compra Costo ($)</label>
+                  <input type="number" class="form-control" placeholder="0.00" [(ngModel)]="nuevoProducto.precioCompra"
+                    name="prodPrecioCompra">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-bold text-primary">Precio Venta Público ($)</label>
+                  <input type="number" class="form-control" placeholder="0.00" [(ngModel)]="nuevoProducto.precio"
+                    name="prodPrecioVenta">
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Categoría</label>
+                <input type="text" class="form-control" placeholder="Ej: Bebidas" [(ngModel)]="nuevoProducto.tipo"
+                  name="prodTipo">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Imagen del Producto</label>
+                <div class="input-group">
+                  <input type="file" class="form-control" (change)="onNuevoProductoFileSelected($event)"
+                    accept="image/*">
+                  <button type="button" class="btn btn-primary" (click)="agregarProducto()">
+                    <i class="bi bi-plus-circle"></i> Agregar a Lista
+                  </button>
+                </div>
+              </div>
+
+              <ul class="list-group mb-3" *ngIf="productosTemp.length > 0">
+                <li class="list-group-item d-flex justify-content-between align-items-center"
+                  *ngFor="let prod of productosTemp; let i = index">
+                  <div class="d-flex align-items-center">
+                    <img *ngIf="prod.imagen" [src]="prod.imagen" class="me-2 rounded"
+                      style="width: 30px; height: 30px; object-fit: cover;">
+                    <div>
+                      <strong>{{ prod.nombre }}</strong>
+                      <br><small>Compra: ${{ prod.precioCompra }} | Venta: ${{ prod.precio }}</small>
+                      <br><small class="text-muted">{{ prod.tipo }}</small>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                    (click)="eliminarProductoTemp(i)">x</button>
+                </li>
+              </ul>
+            </div>
+            <!-- FIN SECCIÓN PRODUCTOS -->
+
             <div class="d-grid gap-2">
               <button type="submit" class="btn" [ngClass]="editando ? 'btn-dark' : 'btn-warning'">
                 {{ editando ? 'Actualizar' : 'Guardar' }}
@@ -50,7 +115,7 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar proveedor..." [(ngModel)]="searchText">
+          <input type="text" class="form-control" placeholder="🔍 Buscar proveedor..." [(ngModel)]="searchText">
         </div>
         <div class="card-body">
           <table class="table table-hover align-middle">
@@ -78,6 +143,6 @@
       </div>
     </div>
   </div>
-  
- 
+
+
 </div>

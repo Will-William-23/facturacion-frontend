@@ -1,15 +1,16 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Importar ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Producto } from '../../interfaces/producto';
 import Swal from 'sweetalert2';
-import { FilterPipe } from '../../pipes/filter.pipe'; // <-- Importar Pipe
+import { FilterPipe } from '../../pipes/filter.pipe';
+
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, FilterPipe], // <-- Agregar Pipe
+  imports: [CommonModule, FormsModule, RouterLink, FilterPipe],
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.css']
 })
@@ -18,10 +19,15 @@ export class ProductosComponent implements OnInit {
   productos: Producto[] = [];
   productoForm: Producto = { nombre: '', descripcion: '', precio: 0, stock: 0 };
   editando: boolean = false;
-  searchText: string = ''; // <-- Variable para el buscador
+  searchText: string = '';
   private contieneLetrasRegex = /[a-zA-Z]/;
 
-  // Inyectamos 'cd'
+  // Variables para Abastecimiento
+  proveedores: any[] = [];
+  restockForm = { proveedorId: null, productoId: null, cantidad: 0 };
+  productosDelProveedor: Producto[] = [];
+  mostrarModalAbastecer: boolean = false;
+
   constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -32,11 +38,59 @@ export class ProductosComponent implements OnInit {
     this.api.get('productos').subscribe({
       next: (data) => {
         this.productos = data;
-        this.cd.detectChanges(); // <-- ESTO FUERZA LA ACTUALIZACIÓN VISUAL
+        this.cd.detectChanges();
       },
       error: (e) => console.error(e)
     });
   }
+
+  // --- LOGICA ABASTECIMIENTO ---
+  cargarProveedores() {
+    this.api.get('proveedores').subscribe(data => this.proveedores = data);
+  }
+
+  abrirAbastecer() {
+    this.cargarProveedores();
+    this.mostrarModalAbastecer = true;
+    this.restockForm = { proveedorId: null, productoId: null, cantidad: 0 };
+  }
+
+  cerrarAbastecer() {
+    this.mostrarModalAbastecer = false;
+  }
+
+  onProveedorChange() {
+    if (this.restockForm.proveedorId) {
+      // Filtramos productos que tienen asignado este proveedor
+      this.productosDelProveedor = this.productos.filter(p => p.proveedor && p.proveedor.id == this.restockForm.proveedorId);
+    }
+  }
+
+  guardarAbastecimiento() {
+    if (!this.restockForm.productoId || this.restockForm.cantidad <= 0) {
+      Swal.fire('Error', 'Seleccione producto y cantidad válida', 'warning');
+      return;
+    }
+
+    // Buscar el producto seleccionado (de la lista general o filtrada)
+    const producto = this.productos.find(p => p.id == this.restockForm.productoId);
+
+    if (producto) {
+      const nuevoStock = producto.stock + this.restockForm.cantidad;
+      producto.stock = nuevoStock;
+
+      // Actualizar en backend
+      this.api.put(`productos/${producto.id}`, producto).subscribe({
+        next: () => {
+          Swal.fire('Éxito', 'Stock abastecido correctamente', 'success');
+          this.cerrarAbastecer();
+          this.cargarProductos();
+        },
+        error: () => Swal.fire('Error', 'No se pudo actualizar stock', 'error')
+      });
+    }
+  }
+  // -----------------------------
 
   editarProducto(producto: Producto) {
     this.editando = true;

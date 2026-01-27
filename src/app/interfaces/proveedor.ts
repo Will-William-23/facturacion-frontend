@@ -6,4 +6,5 @@ export interface Proveedor {
     telefono: string;
     email: string;
     direccion: string;
+    productos?: any[];
 }

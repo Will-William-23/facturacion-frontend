@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CartService, CartItem } from '../../services/cart.service';
 import { VentaService } from '../../services/venta.service';
 import { ApiService } from '../../services/api.service';
-import { Router, RouterLink } from '@angular/router'; // Import RouterLink
+import { Router, RouterLink } from '@angular/router';
 import Swal from 'sweetalert2';
+import { MetodoPago } from '../../interfaces/metodo-pago';
 
 @Component({
     selector: 'app-carrito',
     standalone: true,
-    imports: [CommonModule, RouterLink], // Add RouterLink here
+    imports: [CommonModule, RouterLink, FormsModule],
     templateUrl: './carrito.component.html',
     styleUrls: ['./carrito.component.css']
 })
@@ -17,6 +19,8 @@ export class CarritoComponent implements OnInit {
 
     cartItems: CartItem[] = [];
     total: number = 0;
+    metodosPago: MetodoPago[] = [];
+    metodoPagoSeleccionado: number | null = null;
 
     constructor(
         private cartService: CartService,
@@ -29,6 +33,17 @@ export class CarritoComponent implements OnInit {
         this.cartService.cart$.subscribe(items => {
             this.cartItems = items;
             this.total = this.cartService.getTotal();
+        });
+
+        this.ventaService.getMetodosPago().subscribe(metodos => {
+            this.metodosPago = metodos;
+            // Seleccionar efectivo por defecto si existe, o el primero
+            const efectivo = metodos.find(m => m.codigo === '01');
+            if (efectivo) {
+                this.metodoPagoSeleccionado = efectivo.id;
+            } else if (metodos.length > 0) {
+                this.metodoPagoSeleccionado = metodos[0].id;
+            }
         });
     }
 
@@ -117,9 +132,14 @@ export class CarritoComponent implements OnInit {
     }
 
     procesarVenta(clienteId: number) {
+        if (!this.metodoPagoSeleccionado) {
+            Swal.fire('Atención', 'Por favor selecciona un método de pago.', 'warning');
+            return;
+        }
+
         Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
 
-        this.ventaService.realizarCompra(clienteId, this.cartItems).subscribe({
+        this.ventaService.realizarCompra(clienteId, this.cartItems, this.metodoPagoSeleccionado).subscribe({
             next: (res) => {
                 Swal.fire('Compra Exitosa', `Venta #${res.id} registrada.`, 'success');
                 this.cartService.clearCart();

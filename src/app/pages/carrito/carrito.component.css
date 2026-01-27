@@ -1,4 +1,15 @@
-/* Estilos adicionales si es necesario */
-table {
-    width: 100%;
+/* Fix for select visibility */
+select#metodoPago {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    opacity: 1 !important;
+    border: 1px solid #d1d5db;
+    /* gray-300 */
+    display: block !important;
+    min-height: 40px;
+}
+
+select#metodoPago option {
+    background-color: #ffffff !important;
+    color: #333333 !important;
 }

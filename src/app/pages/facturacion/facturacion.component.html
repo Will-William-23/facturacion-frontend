@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="text-primary">Nueva Venta</h2>
-    
+
   </div>
 
   <div class="row">
@@ -10,7 +10,7 @@
       <div class="card shadow-sm mb-3">
         <div class="card-header bg-dark text-white">1. Datos de Venta</div>
         <div class="card-body">
-          
+
           <!-- Selector Cliente -->
           <div class="mb-3">
             <label class="form-label fw-bold">Cliente</label>
@@ -18,6 +18,17 @@
               <option [ngValue]="null" disabled selected>Seleccione...</option>
               <option *ngFor="let c of clientes" [value]="c.id">
                 {{ c.nombre }} {{ c.apellido }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Selector Método de Pago -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Método de Pago</label>
+            <select class="form-select" [(ngModel)]="metodoPagoSeleccionado">
+              <option [ngValue]="null" disabled selected>Seleccione...</option>
+              <option *ngFor="let m of metodosPago" [value]="m.id">
+                {{ m.codigo }} - {{ m.descripcion }}
               </option>
             </select>
           </div>
@@ -54,7 +65,7 @@
       <div class="card shadow-sm h-100">
         <div class="card-header bg-light fw-bold">2. Detalle de Factura</div>
         <div class="card-body">
-          
+
           <table class="table table-bordered text-center align-middle">
             <thead class="table-secondary">
               <tr>
@@ -88,16 +99,15 @@
         <div class="card-footer bg-white">
           <div class="d-flex justify-content-between align-items-center">
             <h3 class="fw-bold text-dark m-0">Total: ${{ total | number:'1.2-2' }}</h3>
-            <button class="btn btn-success btn-lg px-5" 
-                    (click)="procesarFactura()"
-                    [disabled]="carrito.length === 0 || !clienteSeleccionado">
+            <button class="btn btn-success btn-lg px-5" (click)="procesarFactura()"
+              [disabled]="carrito.length === 0 || !clienteSeleccionado">
               💾 Facturar
             </button>
           </div>
-          
+
         </div>
       </div>
     </div>
   </div>
- 
+
 </div>
