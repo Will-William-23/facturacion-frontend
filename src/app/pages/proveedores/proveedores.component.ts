@@ -15,11 +15,16 @@ import Swal from 'sweetalert2';
   styleUrls: ['./proveedores.component.css']
 })
 export class ProveedoresComponent implements OnInit {
-
   proveedores: Proveedor[] = [];
-  form: Proveedor = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
+  form: Proveedor = {
+    ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '',
+    email: '', direccion: '', categoria: 'General', productos: []
+  };
   editando: boolean = false;
   searchText: string = '';
+
+  private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  private telefonoRegex = /^[0-9+ ]{7,15}$/;
 
   constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
@@ -32,14 +37,38 @@ export class ProveedoresComponent implements OnInit {
     });
   }
 
+  // --- VALIDACIÓN DE RUC ECUATORIANO ---
+  validarRuc(ruc: string): boolean {
+    if (ruc.length !== 13) return false;
+    if (!ruc.endsWith('001')) return false;
+
+    const provincia = parseInt(ruc.substring(0, 2));
+    if (provincia < 1 || provincia > 24) return false;
+
+    return true;
+  }
+
   editar(item: Proveedor) {
     this.editando = true;
     this.form = { ...item };
   }
 
   guardar() {
-    if (!this.form.ruc.trim() || !this.form.nombreEmpresa.trim()) {
-      Swal.fire('Error', 'RUC y Empresa son obligatorios', 'warning');
+    // VALIDACIONES
+    if (!this.validarRuc(this.form.ruc)) {
+      Swal.fire('RUC Inválido', 'Debe tener 13 dígitos, empezar con código de provincia válido y terminar en 001.', 'error');
+      return;
+    }
+    if (!this.form.nombreEmpresa.trim()) {
+      Swal.fire('Campo Vacío', 'El nombre de la empresa es obligatorio.', 'warning');
+      return;
+    }
+    if (this.form.email && !this.emailRegex.test(this.form.email)) {
+      Swal.fire('Email Inválido', 'Formato incorrecto.', 'warning');
+      return;
+    }
+    if (this.form.telefono && !this.telefonoRegex.test(this.form.telefono)) {
+      Swal.fire('Teléfono Inválido', 'Solo números.', 'warning');
       return;
     }
 
@@ -51,12 +80,11 @@ export class ProveedoresComponent implements OnInit {
 
     obs.subscribe({
       next: () => {
-        Swal.fire('Éxito', 'Proveedor guardado', 'success');
-        this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
-        this.editando = false;
+        Swal.fire('Éxito', 'Proveedor guardado correctamente', 'success');
+        this.cancelar();
         this.cargar();
       },
-      error: () => Swal.fire('Error', 'No se pudo guardar', 'error')
+      error: () => Swal.fire('Error', 'No se pudo guardar (¿RUC Duplicado?)', 'error')
     });
   }
 
@@ -75,9 +103,10 @@ export class ProveedoresComponent implements OnInit {
 
   cancelar() {
     this.editando = false;
-    this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', productos: [] };
+    this.form = { ruc: '', nombreEmpresa: '', contactoNombre: '', telefono: '', email: '', direccion: '', categoria: 'General', productos: [] };
   }
 
+  // --- MÉTODOS DE PRODUCTOS (Inline) ---
   agregarProducto() {
     if (!this.form.productos) {
       this.form.productos = [];

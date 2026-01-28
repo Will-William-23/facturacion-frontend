@@ -11,8 +11,8 @@
         <div class="card-body">
           <form (ngSubmit)="guardarCliente()">
             <div class="mb-2">
-              <label>Cédula</label>
-              <input type="text" class="form-control" [(ngModel)]="clienteForm.cedula" name="cedula" maxlength="10" required>
+              <label>Cédula/RUC</label>
+              <input type="text" class="form-control" [(ngModel)]="clienteForm.cedula" name="cedula" required>
             </div>
             <div class="mb-2">
               <label>Nombre</label>
@@ -23,6 +23,10 @@
               <input type="text" class="form-control" [(ngModel)]="clienteForm.apellido" name="apellido" required>
             </div>
             <div class="mb-2">
+              <label>Teléfono</label>
+              <input type="text" class="form-control" [(ngModel)]="clienteForm.telefono" name="telefono" required>
+            </div>
+            <div class="mb-2">
               <label>Email</label>
               <input type="email" class="form-control" [(ngModel)]="clienteForm.email" name="email" required>
             </div>
@@ -30,38 +34,60 @@
               <label>Dirección</label>
               <input type="text" class="form-control" [(ngModel)]="clienteForm.direccion" name="direccion" required>
             </div>
-            
+
             <div class="d-grid gap-2">
-              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">
-                {{ editando ? 'Actualizar' : 'Guardar' }}
-              </button>
-              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">{{ editando ?
+                'Actualizar' : 'Guardar' }}</button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary"
+                (click)="cancelarEdicion()">Cancelar</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Tabla con Buscador -->
+    <!-- Tabla Avanzada -->
     <div class="col-md-8">
       <div class="card shadow-sm">
-        <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar por nombre..." [(ngModel)]="searchText">
+        <div class="card-header bg-light d-flex gap-2">
+          <!-- BUSCADOR -->
+          <input type="text" class="form-control" placeholder="🔍 Buscar por nombre, cédula, email..."
+            [(ngModel)]="searchText">
+
+          <!-- ORDENAR -->
+          <select class="form-select w-auto" [(ngModel)]="sortField">
+            <option value="nombre">Ordenar: Nombre</option>
+            <option value="apellido">Ordenar: Apellido</option>
+            <option value="cedula">Ordenar: Cédula</option>
+          </select>
+          <button class="btn btn-outline-secondary" (click)="sortDir = sortDir === 'asc' ? 'desc' : 'asc'">
+            <i class="bi" [ngClass]="sortDir === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up-alt'"></i>
+          </button>
         </div>
-        <div class="card-body">
+
+        <div class="card-body table-responsive">
           <table class="table table-hover align-middle">
             <thead class="table-light">
               <tr>
-                <th>Cédula</th>
-                <th>Nombre</th>
+                <th (click)="cambiarOrden('cedula')" style="cursor: pointer;">ID ↕</th>
+                <th (click)="cambiarOrden('nombre')" style="cursor: pointer;">Cliente ↕</th>
+                <th>Contacto</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Aplicamos el Pipe: filter:searchText -->
-              <tr *ngFor="let c of clientes | filter:searchText:'nombre'">
-                <td>{{ c.cedula }}</td>
-                <td>{{ c.nombre }} {{ c.apellido }}</td>
+              <!-- USO DE LOS PIPES EN CADENA -->
+              <tr
+                *ngFor="let c of clientes | filter:searchText:'nombre':'apellido':'cedula':'email':'telefono' | sort:sortField:sortDir">
+                <td><span class="badge bg-secondary">{{ c.cedula }}</span></td>
+                <td>
+                  <div class="fw-bold">{{ c.nombre }} {{ c.apellido }}</div>
+                  <small class="text-muted">{{ c.direccion }}</small>
+                </td>
+                <td>
+                  <div><i class="bi bi-whatsapp text-success me-1"></i> {{ c.telefono }}</div>
+                  <div class="small text-muted"><i class="bi bi-envelope me-1"></i> {{ c.email }}</div>
+                </td>
                 <td>
                   <button class="btn btn-warning btn-sm me-2" (click)="editarCliente(c)">✏️</button>
                   <button class="btn btn-danger btn-sm" (click)="eliminarCliente(c.id)">🗑️</button>
@@ -73,6 +99,4 @@
       </div>
     </div>
   </div>
-  
-  
 </div>

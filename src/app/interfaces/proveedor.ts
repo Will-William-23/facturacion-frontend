@@ -9,4 +9,5 @@ export interface Proveedor {
     email: string;
     direccion: string;
     productos?: Producto[];
+    categoria: string;
 }

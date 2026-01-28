@@ -1,37 +1,71 @@
 <div class="container mt-5">
   <div class="card shadow-lg border-0">
-    <div class="card-header bg-info text-white text-center py-4">
-      <h2>📞 Contáctanos</h2>
-      <p class="mb-0">Estamos aquí para ayudarte</p>
+
+    <!-- CABECERA -->
+    <div class="card-header bg-primary text-white text-center py-5"
+      style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+      <h1 class="display-5 fw-bold mb-2">📞 Contáctanos</h1>
+      <p class="lead mb-0">Estamos aquí para ayudarte</p>
     </div>
+
     <div class="card-body p-5">
-      <div class="row text-center">
-        <div class="col-md-4 mb-3">
-          <div class="display-4 text-info mb-2">📧</div>
-          <h5>Email</h5>
-          <p>soporte@facturacion.com</p>
-        </div>
-        <div class="col-md-4 mb-3">
-          <div class="display-4 text-success mb-2">📱</div>
-          <h5>WhatsApp</h5>
-          <p>+593 97 895 8721</p>
-        </div>
-        <div class="col-md-4 mb-3">
-          <div class="display-4 text-danger mb-2">📍</div>
-          <h5>Ubicación</h5>
-          <p>Av. Juan Jaramillo y Antonio Vargas Machuca, Cuenca - Ecuador</p>
-        </div>
+
+      <!-- NOMBRE EMPRESA -->
+      <div class="text-center mb-5">
+        <h3 class="text-dark fw-bold">{{ config.nombreEmpresa }}</h3>
+        <span class="badge bg-secondary">RUC: {{ config.ruc }}</span>
       </div>
-      
-      <div class="text-center mt-4">
-        <p class="text-muted">Horario de atención: Lunes a Viernes de 9:00 a 18:00</p>
+
+      <!-- TARJETAS DE CONTACTO -->
+      <div class="row text-center g-4">
+
+        <!-- EMAIL -->
+        <div class="col-md-4">
+          <div class="p-4 border rounded bg-light h-100">
+            <div class="display-4 text-primary mb-3">📧</div>
+            <h5 class="fw-bold">Correo Electrónico</h5>
+            <p class="text-muted mb-0">
+              <a [href]="'mailto:' + config.email" class="text-decoration-none">
+                {{ config.email || 'No registrado' }}
+              </a>
+            </p>
+          </div>
+        </div>
+
+        <!-- WHATSAPP / TELÉFONO -->
+        <div class="col-md-4">
+          <div class="p-4 border rounded bg-light h-100">
+            <div class="display-4 text-success mb-3">📱</div>
+            <h5 class="fw-bold">Teléfono / WhatsApp</h5>
+            <p class="text-muted mb-0">
+              <a [href]="'tel:' + config.telefono" class="text-decoration-none text-success">
+                {{ config.telefono || 'No registrado' }}
+              </a>
+            </p>
+          </div>
+        </div>
+
+        <!-- UBICACIÓN -->
+        <div class="col-md-4">
+          <div class="p-4 border rounded bg-light h-100">
+            <div class="display-4 text-danger mb-3">📍</div>
+            <h5 class="fw-bold">Ubicación</h5>
+            <p class="text-muted mb-0">
+              {{ config.direccion || 'Sin dirección registrada' }}
+            </p>
+          </div>
+        </div>
+
       </div>
-    </div>
-    <div class="card-footer text-center bg-light">
-      
+
+      <!-- SITIO WEB -->
+      <div class="text-center mt-5" *ngIf="config.sitioWeb">
+        <p class="text-muted">Visita nuestro sitio web:</p>
+        <a [href]="'https://' + config.sitioWeb" target="_blank" class="btn btn-outline-dark rounded-pill px-4">
+          <i class="bi bi-globe me-2"></i> {{ config.sitioWeb }}
+        </a>
+      </div>
+
     </div>
   </div>
- 
 </div>
-
-

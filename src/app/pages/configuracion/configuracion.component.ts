@@ -14,10 +14,19 @@ import Swal from 'sweetalert2';
   styleUrls: ['./configuracion.component.css']
 })
 export class ConfiguracionComponent implements OnInit {
-  
-  config: Configuracion = { nombreEmpresa: '', ruc: '', direccion: '', telefono: '', ivaPorcentaje: 15 };
 
-  constructor(private api: ApiService) {}
+  config: Configuracion = {
+    nombreEmpresa: '',
+    ruc: '',
+    direccion: '',
+    telefono: '',
+    email: '',
+    sitioWeb: '',
+    obligadoContabilidad: 'NO',
+    ivaPorcentaje: 15
+  };
+
+  constructor(private api: ApiService) { }
 
   ngOnInit(): void {
     this.api.getConfig().subscribe({
@@ -28,7 +37,7 @@ export class ConfiguracionComponent implements OnInit {
 
   guardar() {
     Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading() });
-    
+
     this.api.updateConfig(this.config).subscribe({
       next: () => Swal.fire('Éxito', 'Datos de la empresa actualizados', 'success'),
       error: () => Swal.fire('Error', 'No se pudo guardar', 'error')

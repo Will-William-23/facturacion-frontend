@@ -1,12 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm border-bottom border-secondary">
   <div class="container-fluid">
     <span class="navbar-brand fw-bold text-uppercase d-flex align-items-center">
-      <div class="bg-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+      <div class="bg-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center"
+        style="width: 40px; height: 40px;">
         <i class="bi bi-grid-3x3-gap-fill text-white" style="font-size: 1.2rem;"></i>
       </div>
       <span>ERP <span class="text-primary">System</span></span>
     </span>
-    
+
     <div class="d-flex align-items-center text-white">
       <div class="text-end me-3 d-none d-md-block lh-1">
         <div class="fw-bold">{{ usuario }}</div>
@@ -20,150 +21,211 @@
 </nav>
 
 <div class="container-fluid px-4 pb-5">
-  
-  <!-- MONITOR (Solo Admin y Contador para auditoría) -->
+
+  <!-- ACCESO RÁPIDO: MONITOR -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="card border-0 shadow-sm bg-primary text-white overflow-hidden position-relative" 
-           (click)="navegar('/dashboard', ['ADMIN', 'CONTADOR'])" 
-           style="cursor: pointer; background: linear-gradient(45deg, #0d6efd, #0a58ca);">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between position-relative" style="z-index: 1;">
+      <div class="card border-0 shadow-sm bg-primary text-white overflow-hidden position-relative"
+        (click)="navegar('/dashboard', ['ADMIN', 'CONTADOR'])"
+        style="cursor: pointer; background: linear-gradient(45deg, #0d6efd, #0a58ca);">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between position-relative"
+          style="z-index: 1;">
           <div>
             <h4 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2"></i>Monitor del Sistema</h4>
-            <p class="mb-0 opacity-75">Visualiza métricas y estado en tiempo real.</p>
+            <p class="mb-0 opacity-75">Visualiza métricas, ventas y estado del servidor en tiempo real.</p>
           </div>
-          <span class="badge bg-white text-primary rounded-pill px-3 py-2 fs-6">LIVE</span>
+          <span class="badge bg-white text-primary rounded-pill px-3 py-2 fs-6">
+            <span class="spinner-grow spinner-grow-sm me-1" role="status"></span> LIVE
+          </span>
         </div>
+        <i class="bi bi-graph-up position-absolute text-white"
+          style="font-size: 10rem; opacity: 0.1; right: -20px; bottom: -40px;"></i>
       </div>
     </div>
   </div>
 
   <div class="row g-4">
 
-    <!-- 1. FACTURACIÓN (Operativo: Admin y Vendedor) -->
+    <!-- 1. FACTURACIÓN -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm hover-card">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Facturación</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-primary bg-opacity-10 p-2 rounded me-3 text-primary">
+            <i class="bi bi-receipt fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Facturación</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <!-- Nueva Factura: SOLO VENDEDOR Y ADMIN -->
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/facturacion', ['ADMIN', 'VENDEDOR'])">
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/facturacion', ['ADMIN', 'VENDEDOR'])">
               <span class="fw-bold text-primary">Nueva Factura</span>
               <i class="bi bi-plus-circle fs-5"></i>
             </button>
-
-            <!-- Historial: TODOS (El vendedor ve sus ventas, Contador audita) -->
-            <button class="list-group-item list-group-item-action py-2 text-muted" 
-                    (click)="navegar('/historial', ['ADMIN', 'VENDEDOR', 'CONTADOR'])">
-              <i class="bi bi-clock-history me-2"></i>Historial Emitido
+            <button class="list-group-item list-group-item-action py-2 text-muted"
+              (click)="navegar('/historial', ['ADMIN', 'VENDEDOR', 'CONTADOR'])">
+              <i class="bi bi-clock-history me-2"></i>Historial y SRI
             </button>
-
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-arrow-repeat me-2"></i>Recurrente <span class="badge bg-secondary ms-1">Pro</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. CLIENTES (Operativo: Admin y Vendedor) -->
+    <!-- 2. CLIENTES -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm hover-card">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Clientes</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-success bg-opacity-10 p-2 rounded me-3 text-success">
+            <i class="bi bi-people fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Clientes</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/clientes', ['ADMIN', 'VENDEDOR'])">
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/clientes', ['ADMIN', 'VENDEDOR'])">
               <span class="fw-bold text-success">Directorio de Clientes</span>
               <i class="bi bi-person-lines-fill fs-5"></i>
             </button>
-
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-wallet2 me-2"></i>Cuentas por Cobrar
+            </button>
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-geo-alt me-2"></i>Zonificación
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. INVENTARIO (Operativo: Admin y Vendedor) -->
+    <!-- 3. INVENTARIO -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm hover-card">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Inventario</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-warning bg-opacity-10 p-2 rounded me-3 text-warning">
+            <i class="bi bi-box-seam fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Inventario</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/productos', ['ADMIN', 'VENDEDOR'])">
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/productos', ['ADMIN', 'VENDEDOR'])">
               <span class="fw-bold text-dark">Gestión de Productos</span>
               <i class="bi bi-list-check fs-5"></i>
             </button>
-
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-tags me-2"></i>Control de Precios
+            </button>
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-upc-scan me-2"></i>Kardex
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4. PROVEEDORES (Administrativo: Admin y Contador) -->
+    <!-- 4. PROVEEDORES -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm hover-card">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Proveedores</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-indigo bg-opacity-10 p-2 rounded me-3 text-dark" style="background-color: #e0cffc;">
+            <i class="bi bi-truck fs-4 text-primary"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Proveedores</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <!-- VENDEDOR NO ENTRA AQUÍ -->
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/proveedores', ['ADMIN', 'CONTADOR'])">
-              <span class="fw-bold text-indigo">Lista de Proveedores</span>
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/proveedores', ['ADMIN', 'CONTADOR'])">
+              <span class="fw-bold text-primary">Lista de Proveedores</span>
               <i class="bi bi-building fs-5"></i>
             </button>
-
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/compras', ['ADMIN', 'CONTADOR'])">
+              <span class="fw-bold text-dark">
+                <i class="bi bi-cart-plus me-2 text-warning"></i>Registrar Compra
+              </span>
+              <i class="bi bi-chevron-right text-muted small"></i>
+            </button>
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-clipboard-data me-2"></i>Reporte de Gastos
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 5. CONFIGURACIÓN (Solo Admin) -->
+    <!-- 5. CONFIGURACIÓN -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm hover-card">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Configuración</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-secondary bg-opacity-10 p-2 rounded me-3 text-secondary">
+            <i class="bi bi-sliders fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Configuración</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/configuracion', ['ADMIN'])">
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/configuracion', ['ADMIN'])">
               <span class="fw-bold text-secondary">Datos de Empresa</span>
               <i class="bi bi-gear fs-5"></i>
             </button>
-
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-palette me-2"></i>Temas y Colores
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 6. SEGURIDAD (Solo Admin - Oculto para otros) -->
+    <!-- 6. SEGURIDAD (Solo Admin) -->
     <div class="col-md-6 col-xl-4" *ngIf="esAdmin">
       <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
-        <div class="card-header bg-white border-0 pt-4 pb-0"><h5 class="fw-bold mb-0 text-dark">Seguridad</h5></div>
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+          <div class="bg-danger bg-opacity-10 p-2 rounded me-3 text-danger">
+            <i class="bi bi-shield-lock fs-4"></i>
+          </div>
+          <h5 class="fw-bold mb-0 text-dark">Seguridad</h5>
+        </div>
         <div class="card-body">
           <div class="list-group list-group-flush">
-            
-            <button class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center" 
-                    (click)="navegar('/usuarios', ['ADMIN'])">
+            <button
+              class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center"
+              (click)="navegar('/usuarios', ['ADMIN'])">
               <span class="fw-bold text-danger">Usuarios y Roles</span>
               <i class="bi bi-person-gear fs-5"></i>
             </button>
-
+            <button class="list-group-item list-group-item-action py-2 text-muted bg-light" disabled>
+              <i class="bi bi-activity me-2"></i>Auditoría de Accesos
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 7. SOPORTE (Todos) -->
+    <!-- 7. SOPORTE -->
     <div class="col-md-6 col-xl-4">
       <div class="card h-100 border-0 shadow-sm bg-light">
-        <div class="card-body text-center d-flex flex-column justify-content-center">
-          <h6 class="fw-bold mb-3">¿Necesitas Ayuda?</h6>
-          <button class="btn btn-dark rounded-pill" (click)="navegar('/contactanos', ['ADMIN', 'VENDEDOR', 'CONTADOR'])">
-            Contactar Soporte
-          </button>
+        <div class="card-body d-flex align-items-center justify-content-between" (click)="navegar('/contactanos', [])"
+          style="cursor: pointer;">
+          <div>
+            <h6 class="fw-bold mb-1 text-dark">¿Necesitas Ayuda?</h6>
+            <small class="text-muted">Contacta con soporte técnico</small>
+          </div>
+          <div class="bg-white rounded-circle p-3 shadow-sm text-warning">
+            <i class="bi bi-headset fs-4"></i>
+          </div>
         </div>
       </div>
     </div>

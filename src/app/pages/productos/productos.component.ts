@@ -1,35 +1,39 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Importar ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Producto } from '../../interfaces/producto';
 import { Proveedor } from '../../interfaces/proveedor';
+import { FilterPipe } from '../../pipes/filter.pipe';
+import { SortPipe } from '../../pipes/sort.pipe';
 import Swal from 'sweetalert2';
-import { FilterPipe } from '../../pipes/filter.pipe'; // <-- Importar Pipe
+
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, FilterPipe], // <-- Agregar Pipe
+  imports: [CommonModule, FormsModule, RouterLink, FilterPipe, SortPipe],
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.css']
 })
 export class ProductosComponent implements OnInit {
-
   productos: Producto[] = [];
-  productoForm: Producto = { nombre: '', descripcion: '', precio: 0, stock: 0 };
+  productoForm: Producto = { codigoPrincipal: '', nombre: '', descripcion: '', precio: 0, stock: 0, grabaIva: true };
   editando: boolean = false;
-  searchText: string = ''; // <-- Variable para el buscador
+
+  // FILTROS Y ORDEN
+  searchText: string = '';
+  sortField: string = 'stock';
+  sortDir: 'asc' | 'desc' = 'asc';
 
   // LOGICA COMPRA PROVEEDORES
   modoProveedores: boolean = false;
   proveedores: Proveedor[] = [];
   proveedorSeleccionado: Proveedor | null = null;
-  productosProveedor: any[] = []; // Productos del proveedor seleccionado para compra
+  productosProveedor: any[] = [];
 
   private contieneLetrasRegex = /[a-zA-Z]/;
 
-  // Inyectamos 'cd'
   constructor(private api: ApiService, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -41,7 +45,7 @@ export class ProductosComponent implements OnInit {
     this.api.get('productos').subscribe({
       next: (data) => {
         this.productos = data;
-        this.cd.detectChanges(); // <-- ESTO FUERZA LA ACTUALIZACIÓN VISUAL
+        this.cd.detectChanges();
       },
       error: (e) => console.error(e)
     });
@@ -52,6 +56,15 @@ export class ProductosComponent implements OnInit {
       next: (data) => { this.proveedores = data; },
       error: (e) => console.error(e)
     });
+  }
+
+  cambiarOrden(campo: string) {
+    if (this.sortField === campo) {
+      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = campo;
+      this.sortDir = 'asc';
+    }
   }
 
   editarProducto(producto: Producto) {
@@ -69,7 +82,6 @@ export class ProductosComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
-
   guardarProducto() {
     if (!this.productoForm.nombre.trim()) {
       Swal.fire('Atención', 'El nombre es obligatorio.', 'warning');
@@ -124,7 +136,7 @@ export class ProductosComponent implements OnInit {
 
   cancelarEdicion() {
     this.editando = false;
-    this.productoForm = { nombre: '', descripcion: '', precio: 0, stock: 0 };
+    this.productoForm = { codigoPrincipal: '', nombre: '', descripcion: '', precio: 0, stock: 0, grabaIva: true };
   }
 
   finalizarOperacion(msg: string) {
@@ -132,7 +144,6 @@ export class ProductosComponent implements OnInit {
     this.cancelarEdicion();
     this.cargarProductos();
   }
-
   // --- MÉTODOS MODO PROVEEDORES ---
 
   toggleModoProveedores() {
@@ -161,25 +172,17 @@ export class ProductosComponent implements OnInit {
       confirmButtonText: 'Sí, comprar'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Actualizamos el stock
         const nuevoStock = (producto.stock || 0) + producto.cantidadCompra;
-
-        // Llamada a la API para actualizar el producto
-        // IMPORTANTE: Asegúrate de enviar el objeto completo o solo lo necesario según tu backend.
-        // Aquí enviamos todo el producto con el stock actualizado.
         const productoActualizado = { ...producto, stock: nuevoStock };
-        // Eliminamos campos auxiliares antes de enviar si es necesario, 
-        // pero normalmente el backend ignora campos extra o usamos una interfaz limpia.
-        // TypeScript se quejará si no machea la interfaz, pero 'producto' es 'any' aqui temporalmente.
         delete productoActualizado.cantidadCompra;
 
         this.api.put(`productos/${producto.id}`, productoActualizado).subscribe({
           next: () => {
             Swal.fire('Compra realizada', 'Stock actualizado', 'success');
-            producto.stock = nuevoStock; // Actualizamos vista local
-            producto.cantidadCompra = 0; // Reseteamos input
-            this.cargarProductos(); // Actualizamos la lista general también
-            this.cargarProveedores(); // Actualizamos proveedores por si acaso (aunque los datos anidados tal vez no se refresquen solos sin recarga)
+            producto.stock = nuevoStock;
+            producto.cantidadCompra = 0;
+            this.cargarProductos();
+            this.cargarProveedores();
           },
           error: () => Swal.fire('Error', 'No se pudo procesar la compra', 'error')
         });
@@ -187,6 +190,4 @@ export class ProductosComponent implements OnInit {
     });
 
   }
-
-
 }

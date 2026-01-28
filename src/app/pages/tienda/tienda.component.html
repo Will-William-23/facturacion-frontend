@@ -1,0 +1,162 @@
+<!-- NAVBAR PROPIO DE LA TIENDA -->
+<nav class="navbar navbar-light bg-white shadow-sm px-4 mb-4 border-bottom">
+  <div class="container-fluid">
+    <button class="btn btn-outline-danger btn-sm" (click)="logout()">
+      <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
+    </button>
+    <span class="navbar-brand fw-bold text-primary mx-auto">
+      <i class="bi bi-shop me-2"></i> TIENDA ONLINE
+    </span>
+    <div class="d-flex align-items-center text-secondary">
+      <div class="text-end lh-1">
+        <div class="fw-bold text-dark">{{ usuarioNombre }}</div>
+        <small class="badge bg-warning text-dark">{{ usuarioRol }}</small>
+      </div>
+      <div class="ms-2 bg-light rounded-circle p-2"><i class="bi bi-person fs-5"></i></div>
+    </div>
+  </div>
+</nav>
+
+<div class="container pb-5">
+  
+  <!-- VISTA CATÁLOGO -->
+  <div *ngIf="!mostrarCheckout">
+    
+    <!-- BUSCADOR Y CARRITO -->
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control border-start-0 ps-0" placeholder="¿Qué estás buscando hoy?" [(ngModel)]="searchText">
+        </div>
+      </div>
+      <div class="col-md-6 text-end">
+        <button class="btn btn-primary position-relative px-4" (click)="irPagar()" [disabled]="carrito.length === 0">
+          <i class="bi bi-cart-fill me-2"></i> Ver Carrito
+          <span *ngIf="carrito.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+            {{ carrito.length }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- GRID PRODUCTOS -->
+    <div class="row g-4">
+      <div class="col-md-3" *ngFor="let p of productos | filter:searchText:'nombre':'descripcion'">
+        <div class="card h-100 shadow-sm border-0 hover-card">
+          <div class="bg-light text-center py-4 rounded-top position-relative">
+            <i class="bi bi-box-seam display-1 text-secondary opacity-25"></i>
+            <span *ngIf="p.stock <= 5 && p.stock > 0" class="position-absolute top-0 end-0 badge bg-danger m-2">¡Pocos!</span>
+            <span *ngIf="p.stock <= 0" class="position-absolute top-0 end-0 badge bg-secondary m-2">Agotado</span>
+          </div>
+          
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-bold text-dark mb-1">{{ p.nombre }}</h5>
+            <p class="text-muted small flex-grow-1">{{ p.descripcion || 'Producto de alta calidad' }}</p>
+            
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fs-4 fw-bold text-success">${{ p.precio }}</span>
+                <small class="text-muted">Stock: {{ p.stock }}</small>
+              </div>
+
+              <!-- SECCIÓN DE CANTIDAD (NUEVO) -->
+              <div class="input-group">
+                <input type="number" class="form-control text-center" [(ngModel)]="p.cantidadAComprar" min="1" [max]="p.stock" [disabled]="p.stock <= 0">
+                <button class="btn btn-outline-primary" (click)="agregarAlCarrito(p)" [disabled]="p.stock <= 0" title="Agregar al carrito">
+                  <i class="bi bi-cart-plus-fill"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENSAJE VACÍO -->
+    <div *ngIf="productos.length === 0" class="text-center py-5 text-muted">
+      <i class="bi bi-emoji-frown display-1"></i>
+      <p class="mt-3">Cargando productos o no hay resultados...</p>
+    </div>
+  </div>
+
+  <!-- VISTA CHECKOUT (Igual que antes) -->
+  <div *ngIf="mostrarCheckout" class="row justify-content-center animate__animated animate__fadeIn">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0"><i class="bi bi-bag-check me-2"></i>Finalizar Compra</h5>
+          <button class="btn btn-sm btn-light text-primary" (click)="cancelarPago()">Seguir Comprando</button>
+        </div>
+        <div class="card-body p-4">
+          
+          <div class="bg-light p-3 rounded mb-4">
+            <h6 class="fw-bold text-secondary mb-3">Resumen de Pedido</h6>
+            <ul class="list-group list-group-flush bg-transparent">
+              <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0" *ngFor="let item of carrito; let i = index">
+                <div>
+                  <span class="fw-bold">{{ item.producto.nombre }}</span>
+                  <span class="badge bg-secondary ms-2">x{{ item.cantidad }}</span>
+                </div>
+                <div>
+                  <span class="me-3">${{ item.subtotal | number:'1.2-2' }}</span>
+                  <button class="btn btn-sm text-danger" (click)="eliminarDelCarrito(i)">×</button>
+                </div>
+              </li>
+              <li class="list-group-item active d-flex justify-content-between border-top border-secondary mt-2 pt-3 px-0">
+                <span class="fw-bold">TOTAL A PAGAR</span>
+                <span class="fw-bold fs-5">${{ total | number:'1.2-2' }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <h6 class="fw-bold text-secondary mb-3">Sus Datos de Facturación</h6>
+          <form (ngSubmit)="finalizarCompra()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small">Cédula / RUC</label>
+                <input type="text" class="form-control" [(ngModel)]="clienteForm.cedula" name="ced" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Teléfono</label>
+                <input type="text" class="form-control" [(ngModel)]="clienteForm.telefono" name="tel" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Nombres</label>
+                <input type="text" class="form-control" [(ngModel)]="clienteForm.nombre" name="nom" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Apellidos</label>
+                <input type="text" class="form-control" [(ngModel)]="clienteForm.apellido" name="ape" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label small">Email</label>
+                <input type="email" class="form-control" [(ngModel)]="clienteForm.email" name="ema" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label small">Dirección</label>
+                <input type="text" class="form-control" [(ngModel)]="clienteForm.direccion" name="dir" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label small">Forma de Pago</label>
+                <select class="form-select" [(ngModel)]="formaPago" name="pago">
+                  <option value="01">Efectivo</option>
+                  <option value="19">Tarjeta de Crédito / Débito</option>
+                  <option value="20">Transferencia Bancaria</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                <i class="bi bi-check-circle-fill me-2"></i> Confirmar y Pagar
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

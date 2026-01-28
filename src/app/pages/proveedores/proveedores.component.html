@@ -11,15 +11,28 @@
         <div class="card-body">
           <form (ngSubmit)="guardar()">
             <div class="mb-2">
-              <label>RUC</label>
-              <input type="text" class="form-control" [(ngModel)]="form.ruc" name="ruc" maxlength="13" required>
+              <label>RUC (13 Dígitos)</label>
+              <input type="text" class="form-control" [(ngModel)]="form.ruc" name="ruc" maxlength="13" required
+                placeholder="Ej: 17...001">
             </div>
+
+            <div class="mb-2">
+              <label>Categoría</label>
+              <select class="form-select" [(ngModel)]="form.categoria" name="cat">
+                <option value="General">General</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Insumos">Insumos de Oficina</option>
+                <option value="Servicios">Servicios Básicos</option>
+                <option value="Alimentos">Alimentos</option>
+              </select>
+            </div>
+
             <div class="mb-2">
               <label>Empresa</label>
               <input type="text" class="form-control" [(ngModel)]="form.nombreEmpresa" name="empresa" required>
             </div>
             <div class="mb-2">
-              <label>Contacto</label>
+              <label>Contacto (Persona)</label>
               <input type="text" class="form-control" [(ngModel)]="form.contactoNombre" name="contacto">
             </div>
             <div class="mb-2">
@@ -50,35 +63,41 @@
                   <span class="fw-bold">Producto #{{i+1}}</span>
                   <button type="button" class="btn btn-danger btn-sm py-0" (click)="quitarProducto(i)">x</button>
                 </div>
-                
+
                 <div class="mb-1">
-                  <input type="text" class="form-control form-control-sm" placeholder="Nombre" [(ngModel)]="prod.nombre" [name]="'prod_nom_'+i" required>
+                  <input type="text" class="form-control form-control-sm" placeholder="Nombre" [(ngModel)]="prod.nombre"
+                    [name]="'prod_nom_'+i" required>
                 </div>
                 <div class="mb-1">
-                  <input type="text" class="form-control form-control-sm" placeholder="Descripción" [(ngModel)]="prod.descripcion" [name]="'prod_desc_'+i">
+                  <input type="text" class="form-control form-control-sm" placeholder="Descripción"
+                    [(ngModel)]="prod.descripcion" [name]="'prod_desc_'+i">
                 </div>
                 <div class="row g-1 mb-1">
                   <div class="col-6">
-                    <input type="number" class="form-control form-control-sm" placeholder="Precio" [(ngModel)]="prod.precio" [name]="'prod_precio_'+i" required>
+                    <input type="number" class="form-control form-control-sm" placeholder="Precio"
+                      [(ngModel)]="prod.precio" [name]="'prod_precio_'+i" required>
                   </div>
                   <div class="col-6">
-                    <input type="number" class="form-control form-control-sm" placeholder="Stock" [(ngModel)]="prod.stock" [name]="'prod_stock_'+i" required>
+                    <input type="number" class="form-control form-control-sm" placeholder="Stock"
+                      [(ngModel)]="prod.stock" [name]="'prod_stock_'+i" required>
                   </div>
                 </div>
                 <div class="mb-1">
-                    <input type="text" class="form-control form-control-sm" placeholder="Tipo (Categoría)" [(ngModel)]="prod.tipo" [name]="'prod_tipo_'+i">
+                  <input type="text" class="form-control form-control-sm" placeholder="Tipo (Categoría)"
+                    [(ngModel)]="prod.tipo" [name]="'prod_tipo_'+i">
                 </div>
                 <div class="mb-1">
-                    <label class="small text-muted">Imagen</label>
-                    <input type="file" (change)="onFileSelected($event, i)" class="form-control form-control-sm" accept="image/*">
-                    <div *ngIf="prod.imagen" class="mt-1 text-center">
-                        <img [src]="prod.imagen" class="img-thumbnail" style="max-height: 50px;">
-                    </div>
+                  <label class="small text-muted">Imagen</label>
+                  <input type="file" (change)="onFileSelected($event, i)" class="form-control form-control-sm"
+                    accept="image/*">
+                  <div *ngIf="prod.imagen" class="mt-1 text-center">
+                    <img [src]="prod.imagen" class="img-thumbnail" style="max-height: 50px;">
+                  </div>
                 </div>
               </div>
             </div>
             <!-- Fin Sección Productos -->
-            
+
             <div class="d-grid gap-2">
               <button type="submit" class="btn" [ngClass]="editando ? 'btn-dark' : 'btn-warning'">
                 {{ editando ? 'Actualizar' : 'Guardar' }}
@@ -94,23 +113,30 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <input type="text" class="form-control" placeholder="🔍 Buscar proveedor..." [(ngModel)]="searchText">
+          <input type="text" class="form-control" placeholder="🔍 Buscar..." [(ngModel)]="searchText">
         </div>
         <div class="card-body">
           <table class="table table-hover align-middle">
             <thead class="table-dark">
               <tr>
-                <th>RUC</th>
+                <th>RUC / Categoría</th>
                 <th>Empresa</th>
                 <th>Contacto</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let p of proveedores | filter:searchText:'nombreEmpresa'">
-                <td>{{ p.ruc }}</td>
+              <tr
+                *ngFor="let p of proveedores | filter:searchText:'nombreEmpresa':'ruc':'contactoNombre':'categoria':'telefono':'email':'direccion'">
+                <td>
+                  <div class="fw-bold">{{ p.ruc }}</div>
+                  <span class="badge bg-secondary">{{ p.categoria || 'General' }}</span>
+                </td>
                 <td>{{ p.nombreEmpresa }}</td>
-                <td>{{ p.contactoNombre }}<br><small class="text-muted">{{ p.telefono }}</small></td>
+                <td>
+                  <div>{{ p.contactoNombre }}</div>
+                  <small class="text-muted"><i class="bi bi-telephone"></i> {{ p.telefono }}</small>
+                </td>
                 <td>
                   <button class="btn btn-warning btn-sm me-2" (click)="editar(p)">✏️</button>
                   <button class="btn btn-danger btn-sm" (click)="eliminar(p.id)">🗑️</button>
@@ -122,6 +148,4 @@
       </div>
     </div>
   </div>
-  
- 
 </div>

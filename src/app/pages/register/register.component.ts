@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 })
 export class RegisterComponent {
 
+  // CAMBIO: El rol por defecto ahora es CLIENTE
   usuario = { username: '', password: '', role: 'CLIENTE' };
   loading = false;
 
@@ -40,8 +41,7 @@ export class RegisterComponent {
       },
       error: (e) => {
         this.loading = false;
-        // Si el backend devuelve JSON de error, lo mostramos
-        const msg = e.error?.error || 'Error al registrar usuario';
+        const msg = e.error?.error || 'El nombre de usuario ya existe o hubo un error.';
         Swal.fire('Error', msg, 'error');
       }
     });

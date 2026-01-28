@@ -19,9 +19,10 @@ export class MainLayoutComponent implements OnInit {
 
   // VARIABLES DE PERMISOS (Estas son las que faltaban)
   esAdmin: boolean = false;
-  esCliente: boolean = false; // <--- NEW
+  esCliente: boolean = false;
   canOperate: boolean = false; // Para Vendedor y Admin
   canReport: boolean = false;  // Para Contador y Admin
+  canShop: boolean = false;    // Nuevo permiso
 
   constructor(private api: ApiService, private router: Router) { }
 
@@ -45,9 +46,13 @@ export class MainLayoutComponent implements OnInit {
       this.canReport = true;
       this.esAdmin = false;
       this.canOperate = false;
-    } else if (this.rol === 'CLIENTE') { // <--- NEW
+    } else if (this.rol === 'CLIENTE') {
       this.rolEtiqueta = 'CLIENTE';
       this.esCliente = true;
+      this.canShop = true;
+      this.esAdmin = false;
+      this.canOperate = false;
+      this.canReport = false;
     } else {
       this.rolEtiqueta = 'INVITADO';
     }

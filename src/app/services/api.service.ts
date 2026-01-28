@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   // Asegúrate de cambiar esto si subes a AWS (ej: [http://18.217.76.67:8080](http://18.217.76.67:8080))
-  private apiUrl = 'http://localhost:8080'; 
-  
+  private apiUrl = 'http://localhost:8080';
+
   private tokenKey = 'authToken';
   private userKey = 'authUser';
   private roleKey = 'authRole';
@@ -78,22 +78,23 @@ export class ApiService {
   }
 
   // Método para configuración
-  getConfig(): Observable<any> { 
-    return this.http.get(`${this.apiUrl}/configuracion`, { headers: this.getAuthHeaders() }); 
+  getConfig(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/configuracion`, { headers: this.getAuthHeaders() });
   }
-  
-  updateConfig(data: any): Observable<any> { 
-    return this.http.put(`${this.apiUrl}/configuracion`, data, { headers: this.getAuthHeaders() }); 
+
+  updateConfig(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/configuracion`, data, { headers: this.getAuthHeaders() });
   }
 
   // Método para descargar PDF
   descargarPDF(endpoint: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${endpoint}`, { 
+    return this.http.get(`${this.apiUrl}/${endpoint}`, {
       headers: this.getAuthHeaders(),
-      responseType: 'blob' 
+      responseType: 'blob'
     });
   }
-  
+
+
   // Métodos específicos (Proveedores, Usuarios, Registro)
   getProveedores(): Observable<any> { return this.get('proveedores'); }
   createProveedor(data: any): Observable<any> { return this.post('proveedores', data); }
@@ -104,8 +105,18 @@ export class ApiService {
   createUsuario(data: any): Observable<any> { return this.post('usuarios', data); }
   updateUsuario(id: number, data: any): Observable<any> { return this.put(`usuarios/${id}`, data); }
   deleteUsuario(id: number): Observable<any> { return this.delete(`usuarios/${id}`); }
-  
+
   register(usuario: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/register`, usuario);
+  }
+
+  filtrarFacturas(inicio: string, fin: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/facturas/filtro?inicio=${inicio}&fin=${fin}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  registrarCompra(compra: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/compras`, compra, { headers: this.getAuthHeaders() });
   }
 }

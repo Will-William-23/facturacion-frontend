@@ -68,33 +68,44 @@
     <div class="col-md-4 mb-4">
       <div class="card shadow-sm border-success">
         <div class="card-header bg-success text-white">
-          {{ editando ? 'Editar Producto' : 'Nuevo Producto' }}
+          {{ editando ? 'Editar' : 'Nuevo' }} Producto
         </div>
         <div class="card-body">
           <form (ngSubmit)="guardarProducto()">
+            <div class="mb-2">
+              <label>SKU / Código</label>
+              <input type="text" class="form-control" [(ngModel)]="productoForm.codigoPrincipal" name="cod" required>
+            </div>
             <div class="mb-2">
               <label>Nombre</label>
               <input type="text" class="form-control" [(ngModel)]="productoForm.nombre" name="nombre" required>
             </div>
             <div class="mb-2">
               <label>Descripción</label>
-              <input type="text" class="form-control" [(ngModel)]="productoForm.descripcion" name="descripcion">
+              <input type="text" class="form-control" [(ngModel)]="productoForm.descripcion" name="desc">
             </div>
+
             <div class="row">
               <div class="col-6 mb-2">
-                <label>Precio ($)</label>
-                <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="precio" required>
+                <label>Precio</label>
+                <input type="number" class="form-control" [(ngModel)]="productoForm.precio" name="prec" required>
               </div>
-              <div class="col-6 mb-3">
+              <div class="col-6 mb-2">
                 <label>Stock</label>
-                <input type="number" class="form-control" [(ngModel)]="productoForm.stock" name="stock" required>
+                <input type="number" class="form-control" [(ngModel)]="productoForm.stock" name="stk" required>
               </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-2">
               <label>Tipo (Categoría)</label>
               <input type="text" class="form-control" placeholder="Ej: Lacteo, Hogar..." [(ngModel)]="productoForm.tipo"
                 name="tipo">
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="productoForm.grabaIva" name="iva"
+                id="ivaCheck">
+              <label class="form-check-label" for="ivaCheck">Graba IVA</label>
             </div>
 
             <div class="mb-3">
@@ -106,41 +117,61 @@
             </div>
 
             <div class="d-grid gap-2">
-              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">
-                {{ editando ? 'Actualizar' : 'Guardar' }}
-              </button>
-              <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">
-                Cancelar
-              </button>
+              <button type="submit" class="btn" [ngClass]="editando ? 'btn-warning' : 'btn-success'">{{ editando ?
+                'Actualizar' : 'Guardar' }}</button>
+              <button *ngIf="editando" type="button" class="btn btn-secondary"
+                (click)="cancelarEdicion()">Cancelar</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Tabla con Buscador -->
+    <!-- Tabla Avanzada -->
     <div class="col-md-8">
       <div class="card shadow-sm">
-        <div class="card-header bg-light">
-          <input type="text" class="form-control" placeholder="🔍 Buscar producto..." [(ngModel)]="searchText">
+        <div class="card-header bg-light d-flex gap-2">
+          <!-- BUSCADOR -->
+          <input type="text" class="form-control" placeholder="🔍 Buscar por código, nombre..."
+            [(ngModel)]="searchText">
+
+          <!-- ORDENAR -->
+          <select class="form-select w-auto" [(ngModel)]="sortField">
+            <option value="stock">Ordenar: Stock</option>
+            <option value="precio">Ordenar: Precio</option>
+            <option value="nombre">Ordenar: Nombre</option>
+          </select>
+          <button class="btn btn-outline-secondary" (click)="sortDir = sortDir === 'asc' ? 'desc' : 'asc'">
+            <i class="bi" [ngClass]="sortDir === 'asc' ? 'bi-sort-numeric-down' : 'bi-sort-numeric-up-alt'"></i>
+          </button>
         </div>
-        <div class="card-body">
+
+        <div class="card-body table-responsive">
           <table class="table table-striped align-middle">
             <thead class="table-dark">
               <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Stock</th>
+                <th>Código</th>
+                <th (click)="cambiarOrden('nombre')" style="cursor: pointer;">Producto ↕</th>
+                <th (click)="cambiarOrden('precio')" style="cursor: pointer;">Precio ↕</th>
+                <th (click)="cambiarOrden('stock')" style="cursor: pointer;">Stock ↕</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Filtro aplicado aquí -->
-              <tr *ngFor="let p of productos | filter:searchText:'nombre'">
-                <td>{{ p.nombre }}</td>
-                <td>${{ p.precio }}</td>
+              <!-- Filtro aplicado en múltiples campos: nombre y codigoPrincipal -->
+              <tr *ngFor="let p of productos | filter:searchText:'nombre':'codigoPrincipal' | sort:sortField:sortDir">
+                <td><small class="fw-bold">{{ p.codigoPrincipal }}</small></td>
                 <td>
-                  <span class="badge" [ngClass]="p.stock < 5 ? 'bg-danger' : 'bg-success'">
+                  <div class="d-flex align-items-center">
+                    <img *ngIf="p.imagen" [src]="p.imagen" class="rounded me-2"
+                      style="width: 40px; height: 40px; object-fit: cover;">
+                    <span>{{ p.nombre }}</span>
+                  </div>
+                </td>
+                <td>${{ p.precio }} <span *ngIf="p.grabaIva" class="badge bg-info text-dark"
+                    style="font-size: 0.6rem;">IVA</span></td>
+                <td>
+                  <span class="badge" [ngClass]="p.stock < 10 ? 'bg-danger' : 'bg-success'">
                     {{ p.stock }}
                   </span>
                 </td>
@@ -155,6 +186,4 @@
       </div>
     </div>
   </div>
-
-
 </div>

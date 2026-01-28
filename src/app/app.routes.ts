@@ -12,20 +12,28 @@ import { ContactanosComponent } from './pages/contactanos/contactanos.component'
 import { ProveedoresComponent } from './pages/proveedores/proveedores.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 import { MenuComponent } from './pages/menu/menu.component';
-import { CatalogoComponent } from './pages/catalogo/catalogo.component'; // <--- NEW
-import { CarritoComponent } from './pages/carrito/carrito.component';   // <--- NEW
-import { authGuard } from './guards/auth-guard.component'; // <--- IMPORTAR
+import { CatalogoComponent } from './pages/catalogo/catalogo.component';
+import { CarritoComponent } from './pages/carrito/carrito.component';
+import { TiendaComponent } from './pages/tienda/tienda.component';
+import { authGuard } from './guards/auth-guard.component';
 
 export const routes: Routes = [
   // Rutas Públicas
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 
-  // Rutas Privadas (Protegidas por authGuard)
+  // RUTA TIENDA (Sin Sidebar, Pantalla Completa)
+  {
+    path: 'tienda',
+    component: TiendaComponent,
+    canActivate: [authGuard]
+  },
+
+  // RUTA ADMIN/EMPLEADO (Con Sidebar)
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard], // <--- AQUÍ PROTEGEMOS TODO EL SISTEMA
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'menu', component: MenuComponent },
@@ -37,8 +45,8 @@ export const routes: Routes = [
       { path: 'contactanos', component: ContactanosComponent },
       { path: 'proveedores', component: ProveedoresComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
-      { path: 'catalogo', component: CatalogoComponent }, // <--- NEW
-      { path: 'carrito', component: CarritoComponent },   // <--- NEW
+      { path: 'catalogo', component: CatalogoComponent },
+      { path: 'carrito', component: CarritoComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

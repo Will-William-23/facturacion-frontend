@@ -1,0 +1,73 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-dark"><i class="bi bi-cart-plus me-2"></i>Registrar Compra</h2>
+  </div>
+
+  <div class="row">
+    <!-- PANEL IZQUIERDO -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm border-dark">
+        <div class="card-header bg-dark text-white">Datos de Compra</div>
+        <div class="card-body">
+          
+          <label>Proveedor</label>
+          <select class="form-select mb-3" [(ngModel)]="provSeleccionado">
+            <option [ngValue]="null" disabled selected>Seleccione...</option>
+            <option *ngFor="let p of proveedores" [value]="p.id">{{ p.nombreEmpresa }}</option>
+          </select>
+
+          <label>N° Comprobante (Físico)</label>
+          <input type="text" class="form-control mb-3" [(ngModel)]="numComprobante" placeholder="Ej: 001-002-1234">
+
+          <hr>
+
+          <label>Producto</label>
+          <select class="form-select mb-2" [(ngModel)]="prodSeleccionado" (change)="onProdChange()">
+            <option [ngValue]="null" disabled selected>Seleccione...</option>
+            <option *ngFor="let p of productos" [value]="p.id">{{ p.nombre }} (Stock: {{p.stock}})</option>
+          </select>
+
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label>Cantidad</label>
+              <input type="number" class="form-control" [(ngModel)]="cantidad" min="1">
+            </div>
+            <div class="col-6 mb-3">
+              <label>Costo Unit.</label>
+              <input type="number" class="form-control" [(ngModel)]="costo" min="0.01">
+            </div>
+          </div>
+
+          <button class="btn btn-secondary w-100" (click)="agregar()" [disabled]="!prodActual">⬇ Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light">Detalle de Abastecimiento</div>
+        <div class="card-body p-0 table-responsive">
+          <table class="table table-striped mb-0 text-center align-middle">
+            <thead class="table-secondary">
+              <tr><th>Producto</th><th>Costo</th><th>Cant.</th><th>Subtotal</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of carrito; let i = index">
+                <td>{{ item.producto.nombre }}</td>
+                <td>${{ item.costoUnitario }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal }}</td>
+                <td><button class="btn btn-danger btn-sm py-0" (click)="eliminar(i)">×</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer bg-white p-3 text-end">
+          <h3 class="fw-bold mb-3">Total Compra: ${{ total | number:'1.2-2' }}</h3>
+          <button class="btn btn-dark px-5" (click)="guardar()" [disabled]="carrito.length === 0">✅ CONFIRMAR COMPRA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

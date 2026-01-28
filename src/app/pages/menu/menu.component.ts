@@ -18,18 +18,19 @@ export class MenuComponent implements OnInit {
   rolEtiqueta: string = '';
   esAdmin: boolean = false;
 
-  constructor(private router: Router, private api: ApiService) {}
+  constructor(private router: Router, private api: ApiService) { }
 
   ngOnInit(): void {
     this.usuario = this.api.getUsername() || 'Usuario';
     this.rol = this.api.getRole() || 'INVITADO';
-    
-    // Etiquetas amigables
+
+    // Mapeo de etiquetas para que se vea profesional
     const etiquetas: any = {
       'ADMIN': 'ADMINISTRADOR',
       'VENDEDOR': 'VENDEDOR',
       'CONTADOR': 'CONTADOR / AUDITOR'
     };
+
     this.rolEtiqueta = etiquetas[this.rol] || this.rol;
     this.esAdmin = (this.rol === 'ADMIN');
   }
@@ -40,18 +41,18 @@ export class MenuComponent implements OnInit {
   }
 
   // --- FUNCIÓN INTELIGENTE DE NAVEGACIÓN ---
-  // Recibe la ruta y una lista de roles permitidos (Ej: ['ADMIN', 'VENDEDOR'])
+  // Verifica si el usuario tiene permiso antes de cambiar de página
   navegar(ruta: string, rolesPermitidos: string[]) {
-    
-    // 1. Si el usuario tiene uno de los roles permitidos, pasa.
-    if (rolesPermitidos.includes(this.rol)) {
+
+    // 1. Si la lista está vacía (acceso público) o si mi rol está en la lista:
+    if (rolesPermitidos.length === 0 || rolesPermitidos.includes(this.rol)) {
       this.router.navigate([ruta]);
-    } 
-    // 2. Si no tiene permiso, BLOQUEAMOS y mostramos alerta.
+    }
+    // 2. Si no tiene permiso, BLOQUEAMOS y mostramos alerta roja.
     else {
       Swal.fire({
         title: 'Acceso Restringido',
-        text: `Tu rol de ${this.rolEtiqueta} no tiene permisos para acceder a este módulo.`,
+        text: `Tu perfil de ${this.rolEtiqueta} no tiene autorización para ingresar a este módulo.`,
         icon: 'error',
         confirmButtonColor: '#d33',
         confirmButtonText: 'Entendido'

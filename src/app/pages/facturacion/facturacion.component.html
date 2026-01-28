@@ -1,103 +1,147 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary">Nueva Venta</h2>
-    
+    <h2 class="text-primary fw-bold"><i class="bi bi-cart4 me-2"></i>Nueva Venta</h2>
   </div>
 
   <div class="row">
     <!-- PANEL IZQUIERDO: SELECCIÓN -->
-    <div class="col-md-4">
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-dark text-white">1. Datos de Venta</div>
+    <div class="col-lg-4 mb-4">
+
+      <!-- SECCIÓN CLIENTE -->
+      <div class="card shadow-sm mb-3 border-primary">
+        <div class="card-header bg-primary text-white fw-bold">1. Datos del Cliente</div>
         <div class="card-body">
-          
-          <!-- Selector Cliente -->
-          <div class="mb-3">
-            <label class="form-label fw-bold">Cliente</label>
-            <select class="form-select" [(ngModel)]="clienteSeleccionado">
-              <option [ngValue]="null" disabled selected>Seleccione...</option>
-              <option *ngFor="let c of clientes" [value]="c.id">
-                {{ c.nombre }} {{ c.apellido }}
-              </option>
-            </select>
+          <label class="form-label">Buscar Cliente</label>
+          <select class="form-select mb-3" [(ngModel)]="clienteSeleccionadoId" (change)="onClienteChange()">
+            <option [ngValue]="null" disabled selected>Seleccione...</option>
+            <option *ngFor="let c of clientes" [value]="c.id">
+              {{ c.nombre }} {{ c.apellido }}
+            </option>
+          </select>
+
+          <div *ngIf="clienteActual" class="alert alert-primary mb-0 p-2 small">
+            <div><strong>C.I/RUC:</strong> {{ clienteActual.cedula }}</div>
+            <div><strong>Telf:</strong> {{ clienteActual.telefono }}</div>
+            <div><strong>Email:</strong> {{ clienteActual.email }}</div>
+            <div class="text-truncate"><strong>Dir:</strong> {{ clienteActual.direccion }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN PRODUCTO -->
+      <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning text-dark fw-bold">2. Agregar Productos</div>
+        <div class="card-body">
+          <label class="form-label">Producto</label>
+          <select class="form-select mb-2" [(ngModel)]="productoSeleccionadoId" (change)="onProductoChange()">
+            <option [ngValue]="null" disabled selected>Seleccione...</option>
+            <option *ngFor="let p of productos" [value]="p.id">
+              {{ p.nombre }} - ${{ p.precio }}
+            </option>
+          </select>
+
+          <div *ngIf="productoActual" class="d-flex justify-content-between mb-3">
+            <span class="badge bg-secondary">Precio: ${{ productoActual.precio }}</span>
+            <span class="badge" [ngClass]="productoActual.stock > 5 ? 'bg-success' : 'bg-danger'">
+              Stock: {{ productoActual.stock }}
+            </span>
+            <span class="badge bg-info text-dark" *ngIf="productoActual.grabaIva">IVA 15%</span>
           </div>
 
-          <hr>
-
-          <!-- Selector Producto -->
-          <div class="mb-3">
-            <label class="form-label fw-bold">Producto</label>
-            <select class="form-select" [(ngModel)]="productoSeleccionado">
-              <option [ngValue]="null" disabled selected>Seleccione...</option>
-              <option *ngFor="let p of productos" [value]="p.id">
-                {{ p.nombre }} - ${{ p.precio }} (Stock: {{p.stock}})
-              </option>
-            </select>
-          </div>
-
-          <!-- Cantidad -->
-          <div class="mb-3">
-            <label class="form-label fw-bold">Cantidad</label>
+          <label class="form-label">Cantidad</label>
+          <div class="input-group mb-3">
             <input type="number" class="form-control" [(ngModel)]="cantidad" min="1">
+            <button class="btn btn-dark" (click)="agregarProducto()" [disabled]="!productoActual || cantidad < 1">
+              <i class="bi bi-plus-lg"></i> Agregar
+            </button>
           </div>
-
-          <button class="btn btn-primary w-100" (click)="agregarProducto()">
-            ⬇ Agregar al Carrito
-          </button>
-
         </div>
       </div>
     </div>
 
     <!-- PANEL DERECHO: CARRITO -->
-    <div class="col-md-8">
+    <div class="col-lg-8">
       <div class="card shadow-sm h-100">
-        <div class="card-header bg-light fw-bold">2. Detalle de Factura</div>
-        <div class="card-body">
-          
-          <table class="table table-bordered text-center align-middle">
-            <thead class="table-secondary">
+        <div class="card-header bg-light fw-bold d-flex justify-content-between">
+          <span>3. Detalle de Factura</span>
+          <span class="badge bg-secondary">{{ carrito.length }} Productos Seleccionados</span>
+        </div>
+        <div class="card-body p-0 table-responsive">
+
+          <table class="table table-striped mb-0 text-center align-middle">
+            <thead class="table-dark small">
               <tr>
                 <th>Producto</th>
                 <th>Precio</th>
                 <th>Cant.</th>
                 <th>Subtotal</th>
-                <th>Quitar</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of carrito; let i = index">
-                <td class="text-start">{{ item.producto.nombre }}</td>
-                <td>${{ item.producto.precio }}</td>
+                <td class="text-start fw-bold text-primary">
+                  {{ item.producto.nombre }}
+                  <sup *ngIf="item.producto.grabaIva" class="text-danger">*</sup>
+                </td>
+                <td>${{ item.producto.precio | number:'1.2-2' }}</td>
                 <td>{{ item.cantidad }}</td>
-                <td>${{ item.subtotal }}</td>
+                <td>${{ item.subtotal | number:'1.2-2' }}</td>
                 <td>
-                  <button class="btn btn-danger btn-sm py-0" (click)="eliminarDelCarrito(i)">×</button>
+                  <button class="btn btn-outline-danger btn-sm border-0" (click)="eliminarDelCarrito(i)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
               <tr *ngIf="carrito.length === 0">
-                <td colspan="5" class="text-muted py-4">
-                  <i class="bi bi-cart-x display-6 d-block mb-2"></i>
-                  El carrito está vacío
+                <td colspan="5" class="py-5 text-muted">
+                  <i class="bi bi-cart3 display-4 d-block mb-2"></i>
+                  Agregue productos para comenzar
                 </td>
               </tr>
             </tbody>
           </table>
 
         </div>
-        <div class="card-footer bg-white">
-          <div class="d-flex justify-content-between align-items-center">
-            <h3 class="fw-bold text-dark m-0">Total: ${{ total | number:'1.2-2' }}</h3>
-            <button class="btn btn-success btn-lg px-5" 
-                    (click)="procesarFactura()"
-                    [disabled]="carrito.length === 0 || !clienteSeleccionado">
-              💾 Facturar
-            </button>
+
+        <!-- FOOTER CON TOTALES Y PAGO -->
+        <div class="card-footer bg-white p-3">
+          <div class="row">
+            <!-- SELECCIÓN DE PAGO -->
+            <div class="col-md-6 mb-3 mb-md-0 d-flex align-items-center">
+              <label class="fw-bold me-2">Pago:</label>
+              <select class="form-select form-select-sm" [(ngModel)]="formaPagoSeleccionada">
+                <option value="01">Efectivo </option>
+                <option value="19">Tarjeta de Crédito</option>
+                <option value="20">Transferencia Bancaria</option>
+                <option value="16">Tarjeta de Débito</option>
+              </select>
+            </div>
+
+            <!-- TOTALES -->
+            <div class="col-md-6 text-end">
+              <div class="d-flex justify-content-between mb-1 small">
+                <span class="text-muted">Subtotal:</span>
+                <span class="fw-bold">${{ subtotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">IVA (15%):</span>
+                <span>${{ iva | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between border-top pt-2">
+                <span class="fs-4 fw-bold text-success">Total:</span>
+                <span class="fs-4 fw-bold text-success">${{ total | number:'1.2-2' }}</span>
+              </div>
+            </div>
           </div>
-          
+
+          <button class="btn btn-success w-100 mt-3 py-2 fw-bold shadow-sm" (click)="procesarFactura()"
+            [disabled]="carrito.length === 0 || !clienteSeleccionadoId">
+            <i class="bi bi-check-circle-fill me-2"></i> PROCESAR VENTA
+          </button>
         </div>
+
       </div>
     </div>
   </div>
- 
 </div>

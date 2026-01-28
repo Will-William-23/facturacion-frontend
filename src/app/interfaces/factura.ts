@@ -1,10 +1,16 @@
 export interface DetalleVenta {
-    producto: { id: number; nombre?: string; precio?: number }; // Datos mixtos para lógica y vista
+    producto: {
+        id: number;
+        nombre?: string;
+        precio?: number;
+        grabaIva?: boolean;
+    };
     cantidad: number;
-    subtotal?: number; // Solo para mostrar en tabla
+    subtotal?: number;
 }
 
 export interface FacturaRequest {
     cliente: { id: number };
+    formaPago: string;
     detalles: DetalleVenta[];
 }

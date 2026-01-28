@@ -6,18 +6,22 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FilterPipe implements PipeTransform {
 
-  transform(items: any[], searchText: string, field: string = 'nombre'): any[] {
+  // Recibe n argumentos (campos) para buscar
+  transform(items: any[], searchText: string, ...fields: string[]): any[] {
     if (!items) return [];
     if (!searchText) return items;
 
     searchText = searchText.toLowerCase();
 
     return items.filter(it => {
-      // Busca en el campo especificado (ej: nombre)
-      const val = it[field] ? it[field].toString().toLowerCase() : '';
-      // O busca en una combinación si es necesario
-      return val.includes(searchText);
+      // Revisa cada campo que le pasamos
+      for (const field of fields) {
+        const val = it[field] ? it[field].toString().toLowerCase() : '';
+        if (val.includes(searchText)) {
+          return true; // Si encuentra coincidencia en ALGUNO, lo devuelve
+        }
+      }
+      return false;
     });
   }
 }
-
