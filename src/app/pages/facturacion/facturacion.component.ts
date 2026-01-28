@@ -6,11 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { Cliente } from '../../interfaces/cliente';
 import { Producto } from '../../interfaces/producto';
 import { DetalleVenta, FacturaRequest } from '../../interfaces/factura';
-<<<<<<< HEAD
-import Swal from 'sweetalert2'; // Importamos SweetAlert
-=======
 import Swal from 'sweetalert2';
->>>>>>> origin/main
 
 @Component({
   selector: 'app-facturacion',

@@ -1,35 +1,57 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router'; // <--- 1. IMPORTAR RouterLink
+import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import Swal from 'sweetalert2'; // Importar alertas
-
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // <--- 2. AGREGAR RouterLink AQUÍ
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  // LÓGICA DE REDIRECCIÓN POR ROL
-  if(response.role === 'CLIENTE') {
-  this.router.navigate(['/tienda']);
-} else {
-  this.router.navigate(['/dashboard']);
-}
+
+  credentials = { username: '', password: '' };
+  loading = false;
+
+  constructor(private api: ApiService, private router: Router) { }
+
+  onLogin() {
+    if (!this.credentials.username || !this.credentials.password) {
+      Swal.fire('Campos Vacíos', 'Ingrese usuario y contraseña', 'warning');
+      return;
+    }
+
+    this.loading = true;
+
+    this.api.login(this.credentials).subscribe({
+      next: (response) => {
+        this.api.saveSession(response.jwt, response.username, response.role);
+
+        const Toast = Swal.mixin({
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true
+        });
+        Toast.fire({ icon: 'success', title: `Bienvenido ${response.username}` });
+
+        // LÓGICA DE REDIRECCIÓN POR ROL
+        if (response.role === 'CLIENTE') {
+          this.router.navigate(['/tienda']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       },
-error: (err) => {
-  this.loading = false;
-  Swal.fire({
-    icon: 'error',
-    title: 'Acceso Denegado',
-    text: 'Usuario o contraseña incorrectos',
-    confirmButtonColor: '#d33'
-  });
-}
+      error: (err) => {
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Acceso Denegado',
+          text: 'Usuario o contraseña incorrectos',
+          confirmButtonColor: '#d33'
+        });
+      }
     });
   }
 }
