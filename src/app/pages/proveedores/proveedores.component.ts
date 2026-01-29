@@ -112,11 +112,13 @@ export class ProveedoresComponent implements OnInit {
       this.form.productos = [];
     }
     this.form.productos.push({
+      codigoPrincipal: '',
       nombre: '',
       descripcion: '',
       precio: 0,
       stock: 0,
-      tipo: '',
+      tipo: 'BIEN',
+      grabaIva: true,
       imagen: ''
     });
   }
