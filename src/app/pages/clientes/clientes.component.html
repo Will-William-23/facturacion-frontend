@@ -1,0 +1,185 @@
+<div class="container-fluid py-4" style="background-color: #f4f6f9; min-height: 100vh;">
+  <div class="container">
+    
+    <!-- CABECERA CON TÍTULO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Gestión de Clientes</h2>
+        <small class="text-muted">Administra tu cartera de clientes</small>
+      </div>
+    </div>
+  
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+      <div class="col-lg-4">
+        <!-- Agregamos border-top con color para resaltar -->
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #0d6efd !important;">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h5 class="fw-bold m-0" [ngClass]="editando ? 'text-warning' : 'text-primary'">
+              <i class="bi" [ngClass]="editando ? 'bi-pencil-square' : 'bi-person-plus-fill'"></i>
+              {{ editando ? 'Editar Cliente' : 'Nuevo Registro' }}
+            </h5>
+          </div>
+          
+          <div class="card-body pt-0">
+            <form (ngSubmit)="guardarCliente()">
+              
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Identificación</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-card-heading"></i></span>
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="clienteForm.cedula" name="cedula" maxlength="13" placeholder="Cédula o RUC" required>
+                </div>
+              </div>
+  
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label small fw-bold text-secondary text-uppercase">Nombre</label>
+                  <input type="text" class="form-control" [(ngModel)]="clienteForm.nombre" name="nombre" placeholder="Ej: Juan" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-bold text-secondary text-uppercase">Apellido</label>
+                  <input type="text" class="form-control" [(ngModel)]="clienteForm.apellido" name="apellido" placeholder="Ej: Pérez" required>
+                </div>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Contacto</label>
+                <div class="input-group mb-2">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control border-start-0" [(ngModel)]="clienteForm.email" name="email" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-whatsapp"></i></span>
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="clienteForm.telefono" name="telefono" placeholder="099..." required>
+                </div>
+              </div>
+  
+              <div class="mb-4">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Dirección</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="clienteForm.direccion" name="direccion" placeholder="Calle principal..."></textarea>
+              </div>
+              
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-lg shadow-sm text-white" 
+                        [ngClass]="editando ? 'btn-warning' : 'btn-primary'">
+                  <i class="bi" [ngClass]="editando ? 'bi-check-circle-fill' : 'bi-save-fill'"></i>
+                  {{ editando ? 'Actualizar Datos' : 'Guardar Cliente' }}
+                </button>
+                
+                <button *ngIf="editando" type="button" class="btn btn-outline-secondary border-0" (click)="cancelarEdicion()">
+                  <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+              </div>
+  
+            </form>
+          </div>
+        </div>
+      </div>
+  
+      <!-- COLUMNA DERECHA: TABLA DE LISTADO -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #6c757d !important;">
+          
+          <!-- BARRA DE BÚSQUEDA Y FILTROS (Restaurada) -->
+          <div class="card-header bg-white py-3">
+            <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
+              
+              <!-- Buscador -->
+              <div class="input-group flex-grow-1">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control border-start-0" placeholder="Buscar por nombre, cédula..." [(ngModel)]="searchText">
+              </div>
+
+              <!-- Ordenamiento (Restaurado) -->
+              <div class="d-flex gap-2">
+                <select class="form-select form-select-sm" [(ngModel)]="sortField" style="width: auto; min-width: 140px;">
+                    <option value="nombre">Ordenar: Nombre</option>
+                    <option value="apellido">Ordenar: Apellido</option>
+                    <option value="cedula">Ordenar: Cédula</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-sm" (click)="sortDir = sortDir === 'asc' ? 'desc' : 'asc'" title="Cambiar dirección">
+                    <i class="bi" [ngClass]="sortDir === 'asc' ? 'bi-sort-alpha-down' : 'bi-sort-alpha-up-alt'"></i>
+                </button>
+              </div>
+
+              <div class="text-end text-muted small ms-2 align-self-center">
+                <span class="badge bg-light text-dark border">{{ clientes.length }} Registro</span>
+              </div>
+            </div>
+          </div>
+  
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                  <tr class="small text-uppercase">
+                    <th class="ps-4">Cliente</th>
+                    <th>Identificación</th>
+                    <th>Contacto</th>
+                    <th class="text-end pe-4">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let c of clientes | filter:searchText:'nombre':'apellido':'cedula':'email':'telefono' | sort:sortField:sortDir">
+                    
+                    <!-- CLIENTE CON AVATAR -->
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                          <span class="fw-bold">{{ c.nombre.charAt(0) }}{{ c.apellido.charAt(0) }}</span>
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark">{{ c.nombre }} {{ c.apellido }}</div>
+                          <small class="text-muted text-truncate d-block" style="max-width: 150px;"><i class="bi bi-geo-alt-fill me-1"></i>{{ c.direccion }}</small>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- CÉDULA -->
+                    <td>
+                      <span class="badge bg-secondary bg-opacity-10 text-dark border fw-normal px-3 py-2 font-monospace">
+                        {{ c.cedula }}
+                      </span>
+                    </td>
+  
+                    <!-- CONTACTO -->
+                    <td>
+                      <div class="d-flex flex-column small">
+                        <span class="mb-1"><i class="bi bi-envelope me-2 text-muted"></i>{{ c.email }}</span>
+                        <span class="text-success"><i class="bi bi-whatsapp me-2"></i>{{ c.telefono }}</span>
+                      </div>
+                    </td>
+  
+                    <!-- BOTONES DE ACCIÓN (ICONOS) -->
+                    <td class="text-end pe-4">
+                      <button class="btn btn-sm btn-light text-primary border shadow-sm me-2" (click)="editarCliente(c)" title="Editar">
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+                      <button class="btn btn-sm btn-light text-danger border shadow-sm" (click)="eliminarCliente(c.id)" title="Eliminar">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </td>
+  
+                  </tr>
+  
+                  <!-- ESTADO VACÍO -->
+                  <tr *ngIf="clientes.length === 0">
+                    <td colspan="4" class="text-center py-5">
+                      <div class="text-muted opacity-50 mb-2">
+                        <i class="bi bi-people display-1"></i>
+                      </div>
+                      <p class="text-muted">No hay clientes registrados aún.</p>
+                    </td>
+                  </tr>
+  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

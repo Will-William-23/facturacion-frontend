@@ -1,0 +1,177 @@
+<div class="container-fluid py-4" style="background-color: #f4f6f9; min-height: 100vh;">
+  <div class="container">
+    
+    <!-- CABECERA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Seguridad y Accesos</h2>
+        <small class="text-muted">Gestión de usuarios, contraseñas y roles del sistema</small>
+      </div>
+      <div class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2">
+        <i class="bi bi-shield-lock-fill me-2"></i>Zona Restringida
+      </div>
+    </div>
+  
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #dc3545 !important;">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h5 class="fw-bold m-0" [ngClass]="editando ? 'text-dark' : 'text-danger'">
+              <i class="bi" [ngClass]="editando ? 'bi-pencil-square' : 'bi-person-plus-fill'"></i>
+              {{ editando ? 'Editar Credenciales' : 'Registrar Usuario' }}
+            </h5>
+          </div>
+          
+          <div class="card-body pt-0">
+            <form (ngSubmit)="guardarUsuario()">
+              
+              <!-- USERNAME -->
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Nombre de Usuario</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="usuarioForm.username" name="username" placeholder="Ej: vendedor1" required>
+                </div>
+              </div>
+
+              <!-- PASSWORD -->
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-key"></i></span>
+                  <input type="password" class="form-control border-start-0" [(ngModel)]="usuarioForm.password" name="password" 
+                         [placeholder]="editando ? '(Vacío para mantener actual)' : 'Nueva contraseña'">
+                </div>
+                <small *ngIf="editando" class="text-muted fst-italic" style="font-size: 0.75rem;">
+                  <i class="bi bi-info-circle me-1"></i>Deje en blanco si no desea cambiar la clave.
+                </small>
+              </div>
+
+              <!-- ROL -->
+              <div class="mb-4">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Rol / Permisos</label>
+                <select class="form-select border-start-0 border-end-0 border-top-0 rounded-0" [(ngModel)]="usuarioForm.role" name="role" 
+                        style="border-bottom: 2px solid #dee2e6;">
+                  <option value="ADMIN">🔴 ADMINISTRADOR (Acceso Total)</option>
+                  <option value="CONTADOR">🔵 CONTADOR (Auditoría)</option>
+                  <option value="VENDEDOR">🟢 VENDEDOR (Facturación)</option>
+                  <option value="CLIENTE">⚫ CLIENTE (Solo Tienda)</option>
+                </select>
+              </div>
+              
+              <!-- BOTONES -->
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-lg shadow-sm text-white" 
+                        [ngClass]="editando ? 'btn-dark' : 'btn-danger'">
+                  <i class="bi" [ngClass]="editando ? 'bi-check-circle-fill' : 'bi-shield-check'"></i>
+                  {{ editando ? 'Actualizar Acceso' : 'Crear Usuario' }}
+                </button>
+                <button *ngIf="editando" type="button" class="btn btn-outline-secondary border-0" (click)="cancelar()">
+                  <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+  
+      <!-- COLUMNA DERECHA: TABLA -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #6c757d !important;">
+          
+          <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="input-group w-75">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0" placeholder="Buscar usuario..." [(ngModel)]="searchText">
+                </div>
+                <span class="badge bg-light text-dark border">{{ usuarios.length }} usuarios</span>
+            </div>
+          </div>
+  
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                  <tr class="small text-uppercase">
+                    <th class="ps-4">Usuario</th>
+                    <th>Rol Asignado</th>
+                    <th>Estado</th>
+                    <th class="text-end pe-4">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let u of usuarios | filter:searchText:'username':'role'">
+                    
+                    <!-- USUARIO -->
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center">
+                        <div class="bg-secondary bg-opacity-10 text-dark rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                          <span class="fw-bold text-uppercase">{{ u.username.charAt(0) }}</span>
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark">{{ u.username }}</div>
+                          <small class="text-muted">ID: {{ u.id }}</small>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- ROL (CON COLORES DINÁMICOS) -->
+                    <td>
+                      <span class="badge rounded-pill px-3 py-2 fw-normal" 
+                        [ngClass]="{
+                          'bg-danger': u.role === 'ADMIN',
+                          'bg-success': u.role === 'VENDEDOR',
+                          'bg-info text-dark': u.role === 'CONTADOR',
+                          'bg-dark': u.role === 'CLIENTE'
+                        }">
+                        <i class="bi me-1" 
+                           [ngClass]="{
+                             'bi-shield-fill': u.role === 'ADMIN',
+                             'bi-cart': u.role === 'VENDEDOR',
+                             'bi-calculator': u.role === 'CONTADOR',
+                             'bi-person': u.role === 'CLIENTE'
+                           }"></i>
+                        {{ u.role }}
+                      </span>
+                    </td>
+
+                    <!-- ESTADO (Simulado como Activo siempre) -->
+                    <td>
+                        <span class="text-success small"><i class="bi bi-dot"></i> Activo</span>
+                    </td>
+  
+                    <!-- ACCIONES -->
+                    <td class="text-end pe-4">
+                      <button class="btn btn-sm btn-light text-primary border shadow-sm me-2" (click)="editarUsuario(u)" title="Editar">
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+                      <button class="btn btn-sm btn-light text-danger border shadow-sm" (click)="eliminarUsuario(u.id)" title="Eliminar">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </td>
+  
+                  </tr>
+
+                  <!-- EMPTY STATE -->
+                  <tr *ngIf="usuarios.length === 0">
+                    <td colspan="4" class="text-center py-5">
+                      <div class="text-muted opacity-50 mb-2">
+                        <i class="bi bi-person-x display-1"></i>
+                      </div>
+                      <p class="text-muted">No se encontraron usuarios.</p>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

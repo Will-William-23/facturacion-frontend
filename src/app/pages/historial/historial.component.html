@@ -1,0 +1,155 @@
+<div class="container-fluid py-4" style="background-color: #f4f6f9; min-height: 100vh;">
+  <div class="container">
+    
+    <!-- CABECERA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Historial de Ventas</h2>
+        <small class="text-muted">Registro de facturación y estado SRI</small>
+      </div>
+    </div>
+  
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: RESUMEN Y FILTROS -->
+      <div class="col-lg-4">
+        
+        <!-- KPI: TOTAL DEL PERIODO -->
+        <div class="card border-0 shadow-sm mb-4 bg-primary text-white" style="background: linear-gradient(45deg, #0d6efd, #0a58ca);">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="text-white-50 text-uppercase fw-bold small m-0">Ventas del Periodo</h6>
+              <i class="bi bi-cash-stack fs-4 text-white-50"></i>
+            </div>
+            <h2 class="display-5 fw-bold mb-0">${{ totalPeriodo | number:'1.2-2' }}</h2>
+            <small class="text-white-50">{{ facturas.length }} transacciones encontradas</small>
+          </div>
+        </div>
+
+        <!-- FILTROS DE BÚSQUEDA -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h6 class="fw-bold m-0 text-secondary"><i class="bi bi-funnel me-2"></i>Filtrar por Fecha</h6>
+          </div>
+          <div class="card-body pt-0">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted">Desde</label>
+              <input type="date" class="form-control" [(ngModel)]="fechaInicio">
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-muted">Hasta</label>
+              <input type="date" class="form-control" [(ngModel)]="fechaFin">
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" (click)="filtrar()">
+                <i class="bi bi-search me-2"></i> Buscar Ventas
+              </button>
+              <button class="btn btn-outline-secondary border-0" (click)="limpiarFiltro()">
+                <i class="bi bi-x-circle me-2"></i> Limpiar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  
+      <!-- COLUMNA DERECHA: TABLA DE DATOS -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #6610f2 !important;">
+          
+          <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold m-0 text-dark">Detalle de Transacciones</h6>
+            <span class="badge bg-light text-secondary border">Orden: Más recientes</span>
+          </div>
+  
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                  <tr class="small text-uppercase">
+                    <th class="ps-4">ID / Fecha</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th class="text-center">Estado SRI</th>
+                    <th class="text-end pe-4">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let f of facturas">
+                    
+                    <!-- ID Y FECHA -->
+                    <td class="ps-4">
+                      <div class="fw-bold text-dark">#{{ f.id }}</div>
+                      <div class="small text-muted">
+                        <i class="bi bi-calendar3 me-1"></i>{{ f.fecha | date:'dd/MM/yyyy' }}
+                        <span class="ms-1">{{ f.fecha | date:'shortTime' }}</span>
+                      </div>
+                    </td>
+  
+                    <!-- CLIENTE -->
+                    <td>
+                      <div class="fw-bold text-dark">{{ f.cliente.nombre }} {{ f.cliente.apellido }}</div>
+                      <span class="badge bg-secondary bg-opacity-10 text-secondary border fw-normal" style="font-size: 0.7rem;">
+                        {{ f.cliente.cedula }}
+                      </span>
+                    </td>
+  
+                    <!-- TOTAL -->
+                    <td>
+                      <span class="fw-bold text-success fs-6">${{ f.total | number:'1.2-2' }}</span>
+                    </td>
+
+                    <!-- ESTADO SRI (CAMBIO VISUAL AQUÍ) -->
+                    <td class="text-center">
+                      <span class="badge rounded-pill px-3 py-2" 
+                        [ngClass]="{
+                          'bg-success bg-opacity-10 text-success border border-success': f.estadoSri === 'AUTORIZADO',
+                          'bg-danger text-white border border-danger': f.estadoSri === 'DEVUELTA' || f.estadoSri === 'RECHAZADA',
+                          'bg-warning bg-opacity-10 text-dark border border-warning': !f.estadoSri || f.estadoSri === 'PENDIENTE'
+                        }">
+                        <i class="bi" 
+                           [ngClass]="{
+                             'bi-check-circle-fill': f.estadoSri === 'AUTORIZADO',
+                             'bi-x-circle-fill': f.estadoSri === 'DEVUELTA' || f.estadoSri === 'RECHAZADA',
+                             'bi-clock-fill': !f.estadoSri || f.estadoSri === 'PENDIENTE'
+                           }"></i>
+                        
+                        <!-- LÓGICA DE TEXTO: Si es DEVUELTA muestra RECHAZADA -->
+                        {{ f.estadoSri === 'DEVUELTA' ? 'RECHAZADA' : (f.estadoSri || 'PENDIENTE') }}
+                      </span>
+                    </td>
+  
+                    <!-- BOTONES -->
+                    <td class="text-end pe-4">
+                      <button class="btn btn-sm btn-light text-primary border shadow-sm me-2" (click)="verDetalle(f)" title="Ver Productos">
+                        <i class="bi bi-eye-fill"></i>
+                      </button>
+                      
+                      <button class="btn btn-sm btn-light text-danger border shadow-sm" (click)="descargarPDF(f.id)" title="Descargar PDF">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                      </button>
+                    </td>
+  
+                  </tr>
+
+                  <!-- EMPTY STATE -->
+                  <tr *ngIf="facturas.length === 0">
+                    <td colspan="5" class="text-center py-5">
+                      <div class="text-muted opacity-50 mb-2">
+                        <i class="bi bi-journal-x display-1"></i>
+                      </div>
+                      <p class="text-muted mb-0">No se encontraron ventas en este periodo.</p>
+                      <button class="btn btn-link text-decoration-none btn-sm" (click)="limpiarFiltro()">Ver todo el historial</button>
+                    </td>
+                  </tr>
+  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

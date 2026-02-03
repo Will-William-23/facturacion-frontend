@@ -1,0 +1,176 @@
+<div class="container-fluid py-4" style="background-color: #f4f6f9; min-height: 100vh;">
+  <div class="container">
+    
+    <!-- CABECERA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Gestión de Proveedores</h2>
+        <small class="text-muted">Directorio de abastecimiento y logística</small>
+      </div>
+    </div>
+  
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #ffc107 !important;">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h5 class="fw-bold m-0" [ngClass]="editando ? 'text-dark' : 'text-warning'">
+              <i class="bi" [ngClass]="editando ? 'bi-pencil-square' : 'bi-building-add'"></i>
+              {{ editando ? 'Editar Datos' : 'Nuevo Proveedor' }}
+            </h5>
+          </div>
+          
+          <div class="card-body pt-0">
+            <form (ngSubmit)="guardar()">
+              
+              <!-- RUC y EMPRESA -->
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Datos Fiscales</label>
+                <div class="input-group mb-2">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-card-text"></i></span>
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="form.ruc" name="ruc" maxlength="13" placeholder="RUC (13 Dígitos)" required>
+                </div>
+                <input type="text" class="form-control" [(ngModel)]="form.nombreEmpresa" name="empresa" placeholder="Razón Social / Empresa" required>
+              </div>
+
+              <!-- CATEGORÍA -->
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Clasificación</label>
+                <select class="form-select" [(ngModel)]="form.categoria" name="cat">
+                  <option value="General">General</option>
+                  <option value="Tecnología">Tecnología y Hardware</option>
+                  <option value="Insumos">Insumos de Oficina</option>
+                  <option value="Servicios">Servicios Básicos</option>
+                  <option value="Alimentos">Alimentos y Bebidas</option>
+                </select>
+              </div>
+
+              <!-- CONTACTO -->
+              <div class="mb-4">
+                <label class="form-label small fw-bold text-secondary text-uppercase">Contacto Comercial</label>
+                <div class="input-group mb-2">
+                  <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="form.contactoNombre" name="contacto" placeholder="Nombre del vendedor">
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="text" class="form-control" [(ngModel)]="form.telefono" name="telefono" placeholder="Teléfono">
+                    </div>
+                    <div class="col-6">
+                        <input type="email" class="form-control" [(ngModel)]="form.email" name="email" placeholder="Email">
+                    </div>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <input type="text" class="form-control" [(ngModel)]="form.direccion" name="dir" placeholder="Dirección / Ubicación">
+              </div>
+
+              <!-- BOTONES -->
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-lg shadow-sm text-dark" 
+                        [ngClass]="editando ? 'btn-light border' : 'btn-warning'">
+                  <i class="bi" [ngClass]="editando ? 'bi-check-circle-fill' : 'bi-save-fill'"></i>
+                  {{ editando ? 'Actualizar' : 'Guardar Proveedor' }}
+                </button>
+                <button *ngIf="editando" type="button" class="btn btn-outline-secondary border-0" (click)="cancelar()">
+                  <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+  
+      <!-- COLUMNA DERECHA: TABLA -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow h-100" style="border-top: 4px solid #6c757d !important;">
+          
+          <div class="card-header bg-white py-3">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control border-start-0" placeholder="Buscar por RUC, Empresa..." [(ngModel)]="searchText">
+            </div>
+          </div>
+  
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                  <tr class="small text-uppercase">
+                    <th class="ps-4">Empresa</th>
+                    <th>Categoría</th>
+                    <th>Contacto</th>
+                    <th class="text-end pe-4">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of proveedores | filter:searchText:'nombreEmpresa':'ruc'">
+                    
+                    <!-- EMPRESA -->
+                    <td class="ps-4">
+                      <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-25 text-dark rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                          <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark">{{ p.nombreEmpresa }}</div>
+                          <small class="text-muted font-monospace">{{ p.ruc }}</small>
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- CATEGORÍA -->
+                    <td>
+                      <span class="badge bg-light text-dark border">
+                        {{ p.categoria || 'General' }}
+                      </span>
+                    </td>
+  
+                    <!-- CONTACTO -->
+                    <td>
+                      <div class="small">
+                        <div class="fw-bold">{{ p.contactoNombre }}</div>
+                        <div class="text-muted">
+                            <i class="bi bi-telephone me-1"></i>{{ p.telefono }}
+                        </div>
+                      </div>
+                    </td>
+  
+                    <!-- ACCIONES -->
+                    <td class="text-end pe-4">
+                      <!-- BOTÓN ABASTECER -->
+                      <button class="btn btn-success btn-sm shadow-sm me-2" (click)="irAComprar()" title="Comprar Stock a este Proveedor">
+                        <i class="bi bi-cart-plus-fill me-1"></i> Comprar
+                      </button>
+                      
+                      <button class="btn btn-sm btn-light text-primary border me-1" (click)="editar(p)" title="Editar">
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+                      <button class="btn btn-sm btn-light text-danger border" (click)="eliminar(p.id)" title="Eliminar">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </td>
+  
+                  </tr>
+
+                  <!-- EMPTY STATE -->
+                  <tr *ngIf="proveedores.length === 0">
+                    <td colspan="4" class="text-center py-5">
+                      <div class="text-muted opacity-50 mb-2">
+                        <i class="bi bi-truck display-1"></i>
+                      </div>
+                      <p class="text-muted">No hay proveedores registrados.</p>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+/* EL CONTENEDOR DEL SIDEBAR */
+.sidebar-wrapper {
+    position: fixed;
+    left: -240px; /* Esconde la mayor parte (250px ancho - 10px visibles) */
+    width: 250px;
+    height: 100vh;
+    background-color: #212529;
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animación suave */
+    z-index: 1050; /* Por encima de todo */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    overflow-y: auto;
+}
+
+/* CUANDO PASAS EL MOUSE POR ENCIMA */
+.sidebar-wrapper:hover {
+    left: 0; /* Se muestra completo */
+}
+
+/* PISTA VISUAL (Pequeña franja azul para saber que ahí hay algo) */
+.sidebar-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px; /* Ancho de la franja visible */
+    height: 100%;
+    background: linear-gradient(180deg, #0d6efd 0%, #0a58ca 100%);
+    cursor: pointer;
+}
+
+/* EL CONTENIDO PRINCIPAL */
+#page-content-wrapper {
+    width: 100%;
+    padding: 20px;
+    margin-left: 0; /* Ya no empujamos el contenido */
+    transition: all 0.3s;
+}
+
+/* Estilos de los items */
+.list-group-item-action:hover {
+    background-color: #343a40 !important;
+    color: #0d6efd !important;
+    padding-left: 25px; /* Pequeño movimiento al hacer hover */
+    transition: all 0.2s;
+}
+
+.list-group-item.active {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    font-weight: bold;
+}

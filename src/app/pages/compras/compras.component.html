@@ -1,0 +1,167 @@
+<div class="container-fluid py-4" style="background-color: #f4f6f9; min-height: 100vh;">
+  <div class="container">
+    
+    <!-- CABECERA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Abastecimiento de Inventario</h2>
+        <small class="text-muted">Registro de compras y entrada de mercadería</small>
+      </div>
+      <div class="badge bg-dark bg-opacity-10 text-dark border border-dark px-3 py-2">
+        <i class="bi bi-box-seam-fill me-2"></i>Módulo Logístico
+      </div>
+    </div>
+  
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGRESO -->
+      <div class="col-lg-4">
+        
+        <!-- CARD 1: DATOS DEL PROVEEDOR -->
+        <div class="card border-0 shadow-sm mb-4" style="border-top: 4px solid #212529 !important;">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h6 class="fw-bold m-0 text-dark text-uppercase"><i class="bi bi-building me-2"></i>Origen</h6>
+          </div>
+          <div class="card-body pt-0">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary">Proveedor</label>
+              <select class="form-select" [(ngModel)]="provSeleccionado">
+                <option [ngValue]="null" disabled selected>Seleccione empresa...</option>
+                <option *ngFor="let p of proveedores" [value]="p.id">{{ p.nombreEmpresa }} ({{ p.ruc }})</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small fw-bold text-secondary">N° Comprobante Físico</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-receipt"></i></span>
+                <input type="text" class="form-control border-start-0" [(ngModel)]="numComprobante" placeholder="Ej: 001-001-123456789">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: DATOS DEL PRODUCTO -->
+        <div class="card border-0 shadow-sm" style="border-top: 4px solid #6c757d !important;">
+          <div class="card-header bg-white py-3 border-bottom-0">
+            <h6 class="fw-bold m-0 text-secondary text-uppercase"><i class="bi bi-box-seam me-2"></i>Item a Ingresar</h6>
+          </div>
+          <div class="card-body pt-0">
+            
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary">Producto</label>
+              <select class="form-select" [(ngModel)]="prodSeleccionado" (change)="onProdChange()">
+                <option [ngValue]="null" disabled selected>Buscar producto...</option>
+                <option *ngFor="let p of productos" [value]="p.id">{{ p.nombre }}</option>
+              </select>
+            </div>
+
+            <!-- INFO STOCK ACTUAL -->
+            <div *ngIf="prodActual" class="alert alert-secondary d-flex justify-content-between align-items-center py-2 px-3 mb-3">
+                <small class="mb-0">Stock Actual:</small>
+                <span class="badge bg-dark rounded-pill">{{ prodActual.stock }} unids.</span>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small fw-bold text-secondary">Cantidad</label>
+                <input type="number" class="form-control" [(ngModel)]="cantidad" min="1">
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-bold text-secondary">Costo Unit. ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0 text-muted">$</span>
+                  <input type="number" class="form-control border-start-0" [(ngModel)]="costo" min="0.01">
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-dark w-100 shadow-sm" (click)="agregar()" [disabled]="!prodActual">
+              <i class="bi bi-plus-lg me-1"></i> Agregar a la Lista
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+  
+      <!-- COLUMNA DERECHA: DETALLE DE LA COMPRA -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow h-100">
+          
+          <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold m-0 text-dark">Detalle de Recepción</h6>
+            <span class="badge bg-light text-dark border">{{ carrito.length }} items</span>
+          </div>
+  
+          <div class="card-body p-0 d-flex flex-column">
+            
+            <div class="table-responsive flex-grow-1">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                  <tr class="small text-uppercase">
+                    <th class="ps-4">Producto</th>
+                    <th class="text-center">Costo Unit.</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-end">Subtotal</th>
+                    <th class="text-center pe-4">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of carrito; let i = index">
+                    <td class="ps-4 fw-bold text-dark">{{ item.producto.nombre }}</td>
+                    <td class="text-center text-muted">${{ item.costoUnitario | number:'1.2-2' }}</td>
+                    <td class="text-center">
+                        <span class="badge bg-light text-dark border">{{ item.cantidad }}</span>
+                    </td>
+                    <td class="text-end fw-bold">${{ item.subtotal | number:'1.2-2' }}</td>
+                    <td class="text-center pe-4">
+                      <button class="btn btn-sm text-danger hover-bg-light rounded-circle" (click)="eliminar(i)">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  <!-- EMPTY STATE -->
+                  <tr *ngIf="carrito.length === 0">
+                    <td colspan="5" class="text-center py-5">
+                      <div class="text-muted opacity-25 mb-3">
+                        <i class="bi bi-cart-x display-1"></i>
+                      </div>
+                      <p class="text-muted mb-0">No hay productos en la lista de compra.</p>
+                      <small class="text-muted">Seleccione un proveedor y productos para comenzar.</small>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+
+            <!-- FOOTER CON TOTALES -->
+            <div class="bg-light p-4 mt-auto border-top">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Al guardar, el stock se sumará automáticamente al inventario actual.
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="d-flex justify-content-end align-items-baseline mb-3">
+                            <span class="text-muted me-3 fs-5">Total a Pagar:</span>
+                            <span class="display-6 fw-bold text-dark">${{ total | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a routerLink="/menu" class="btn btn-outline-secondary border-0">Cancelar</a>
+                            <button class="btn btn-success px-5 shadow" (click)="guardar()" [disabled]="carrito.length === 0">
+                                <i class="bi bi-check2-all me-2"></i> Confirmar Ingreso
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
